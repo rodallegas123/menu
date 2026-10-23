@@ -316,7 +316,7 @@ ol li::before{content:counter(s);position:absolute;left:0;top:12px;width:42px;he
     <p class="hint">Swipe left or right to go to the next recipe</p>
   </main>
   <section class="prepview" id="prepView" aria-labelledby="pcTitle">
-    <div class="bar"><a class="btn back" href="#home">&#8962; Home</a><button type="button" class="btn shopbtn" id="pcShopBtn" hidden>Change shop</button></div>
+    <div class="bar"><a class="btn back" href="#home">&#8962; Home</a></div>
     <div class="pchead">
       <h2 id="pcTitle">Prep Check</h2>
       <p id="pcSub">Tap plus for each one you make and minus for each one you use. Green means you are stocked.</p>
@@ -593,11 +593,10 @@ if(document.fonts) document.fonts.ready.then(refit);
 
 // ---------- Prep Check: counts live in the PSICY Prep Check Google Sheet ----------
 const PC_API = "https://script.google.com/macros/s/AKfycby9oBp-IjTgBFJC5JWroHBc7pSyP5dByzxUuWooTd5hbyScsWU8hCX-aqj4aZ7yUo_Q_g/exec";
-const PC_SHOPS = ["Magnolia","Rancho","Galleria"];
+const PC_SHOPS = ["Magnolia"];
 const PC_RECIPES = {"crepe batter":"crepe-batter"};
 const PC = {shop:null, items:[], pending:{}, timers:{}, busy:{}, loaded:false, error:false, picking:false};
-try { PC.shop = localStorage.getItem("psicy-prep-shop"); } catch(e){}
-if(!PC_SHOPS.includes(PC.shop)) PC.shop = null;
+PC.shop = "Magnolia";
 
 function pcStatus(it, n){
   if(n < (Number(it.redBelow) || 3)) return "red";
@@ -650,7 +649,6 @@ function pcRenderShops(){
   const box = $("pcShops"), picking = PC.picking || !PC.shop;
   box.hidden = !picking;
   $("pcList").hidden = picking; $("pcFoot").hidden = picking;
-  $("pcShopBtn").hidden = picking || !PC.shop;
   $("pcTitle").textContent = picking ? "Which shop is this?" : `Prep Check: ${PC.shop}`;
   $("pcSub").textContent = picking ? "Pick this shop once. The tablet will remember it." : "Tap plus for each one you make and minus for each one you use. Green means you are stocked.";
   if(!picking) return;
@@ -727,7 +725,6 @@ async function pcSave(name){
   }finally{ PC.busy[name] = false; pcRender(); }
 }
 
-$("pcShopBtn").onclick = () => { PC.picking = true; pcRender(); const b = $("pcShops").querySelector("button"); if(b) b.focus(); };
 // Refresh every 20 seconds and whenever the screen comes back on, so every tablet stays in sync
 setInterval(() => { if(!document.hidden && !Object.keys(PC.pending).length) pcLoad(); }, 20000);
 document.addEventListener("visibilitychange", () => { if(!document.hidden) pcLoad(); });

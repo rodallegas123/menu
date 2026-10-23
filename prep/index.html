@@ -236,6 +236,7 @@ ol li::before{content:counter(s);position:absolute;left:0;top:12px;width:42px;he
 .pcname{display:flex;flex-direction:column;gap:2px;min-width:0;padding-left:6px}
 .pcname h3{font-size:19px;font-weight:800;color:var(--ink);display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
 .pcneed{font-size:14px;font-weight:700}
+.pcunit{font-size:13px;font-weight:700;color:var(--pink-deep)}
 .pcmeta{display:none}
 .pcrecipe{align-self:flex-start;font-size:13px;font-weight:700;color:var(--pink-deep);text-decoration:underline;text-underline-offset:3px;padding:2px 0}
 .pcctl{display:flex;align-items:center;gap:8px}
@@ -593,7 +594,7 @@ if(document.fonts) document.fonts.ready.then(refit);
 // ---------- Prep Check: counts live in the PSICY Prep Check Google Sheet ----------
 const PC_API = "https://script.google.com/macros/s/AKfycby9oBp-IjTgBFJC5JWroHBc7pSyP5dByzxUuWooTd5hbyScsWU8hCX-aqj4aZ7yUo_Q_g/exec";
 const PC_SHOPS = ["Magnolia"];
-const PC_RECIPES = {"crepe batter":"crepe-batter"};
+const PC_RECIPES = {"crepe batter":"crepe-batter","kadaif":"kadayif","mazapan syrup":"mazapan-sauce","gravy":"gravy","pistachio cream":"pistachio-sauce","fresas con crema sauce":"fresas-sauce","fresas con crema milk":"fresas-milk","cafe de olla syrup":null};
 const PC = {shop:null, items:[], pending:{}, timers:{}, busy:{}, loaded:false, error:false, picking:false};
 PC.shop = "Magnolia";
 
@@ -612,9 +613,14 @@ function pcTime(t){
   return "Updated " + (same ? "today " : d.toLocaleDateString([], {month:"short", day:"numeric"}) + " ") + d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
 }
 function esc(t){ return String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+// "Biscoff Sauce (quarts in back)" shows as the name plus a small "quarts in back" label
+function pcSplit(name){
+  const m = String(name).trim().match(/^(.*?)\s*\((.*)\)\s*$/);
+  return m ? {main:m[1].trim(), unit:m[2].trim()} : {main:String(name).trim(), unit:""};
+}
 function pcRecipe(name){
-  const key = String(name).toLowerCase().trim();
-  if(PC_RECIPES[key]) return PC_RECIPES[key];
+  const key = pcSplit(name).main.toLowerCase();
+  if(key in PC_RECIPES) return PC_RECIPES[key];
   const d = drinks.find(x => x.name.toLowerCase() === key);
   return d ? d.id : null;
 }
@@ -675,11 +681,12 @@ function pcRenderList(){
     const n = pcCount(it), st = pcStatus(it, n), goal = Number(it.goal) || 0, max = Number(it.max) || goal || 99, red = Number(it.redBelow) || 3;
     const short = Math.max(0, goal - n);
     const need = short ? `Need ${short} more to reach ${goal}` : (n >= max && max > goal ? `Full at ${n}. Do not make more.` : `Goal of ${goal} met`);
-    const rid = pcRecipe(it.name), name = esc(it.name);
-    const rec = rid ? `<a class="pcrecipe" href="#${esc(rid)}" aria-label="See the ${name} recipe">Recipe</a>` : "";
+    const rid = pcRecipe(it.name), name = esc(it.name), parts = pcSplit(it.name), main = esc(parts.main), unit = esc(parts.unit);
+    const rec = rid ? `<a class="pcrecipe" href="#${esc(rid)}" aria-label="See the ${main} recipe">Recipe</a>` : "";
     return `<li class="pcrow ${st}">
       <div class="pcname">
-        <h3>${name} <span class="pill ${st}"><span aria-hidden="true">${pcIcon[st]}</span>${pcWord[st]}</span></h3>
+        <h3>${main} <span class="pill ${st}"><span aria-hidden="true">${pcIcon[st]}</span>${pcWord[st]}</span></h3>
+        ${unit ? `<span class="pcunit">Count: ${unit}</span>` : ""}
         <span class="pcneed">${need}</span>
         <span class="pcmeta">Goal ${goal}, max ${max}. Red under ${red}.${it.updatedAt ? " " + pcTime(it.updatedAt) + "." : ""}</span>
         ${rec}

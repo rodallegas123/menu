@@ -266,6 +266,60 @@ ol li::before{content:counter(s);position:absolute;left:0;top:12px;width:42px;he
 .pccat.red{border-color:#B3001B}.pccat.red .cstat{background:#B3001B;color:#FFFFFF}
 .pccat.yellow{border-color:#E0A800}.pccat.yellow .cstat{background:#FFD24D;color:#3D2600}
 .pccat.green{border-color:#1E7B45}.pccat.green .cstat{background:#1E7B45;color:#FFFFFF}
+
+/* ---------- Staff Alert ---------- */
+.app.alerting .side,.app.alerting .main,.app.alerting .prepview{display:none}
+.app:not(.alerting) .alertview{display:none}
+.pcbanner.sabanner{margin-top:14px;border-color:#FFFFFF}
+.alertview{min-height:100vh;padding:14px 20px 30px;max-width:1100px;margin:0 auto}
+.alertview .bar{justify-content:flex-start;gap:12px}
+.alertview .sahead h2{font-size:clamp(30px,4vw,44px);font-weight:800;letter-spacing:-0.02em}
+.alertview .sahead p{margin:4px 0 0;font-weight:600;color:var(--soft);font-size:16px}
+#saTitle:focus,#saDoneTitle:focus{outline:none}
+.sacard{margin-top:16px;background:var(--panel);border:3px solid var(--line);border-radius:28px;padding:22px 24px 24px}
+.sacard fieldset{border:0;margin:24px 0 0;padding:0;min-width:0}
+.sacard fieldset .salegend{margin-top:0}
+.salegend,.salabel{display:block;font-family:"Bricolage Grotesque","Figtree",sans-serif;font-size:22px;font-weight:800;margin:22px 0 10px;padding:0}
+.sacard > :first-child .salegend,.sacard > .salabel:first-child{margin-top:0}
+.salabel .opt{font-family:"Figtree",sans-serif;font-size:16px;font-weight:600;color:var(--soft)}
+.sainput{width:100%;min-height:62px;padding:12px 18px;border-radius:18px;border:3px solid var(--line);background:var(--pink-wash);color:var(--ink);font-size:20px}
+.sainput::placeholder{color:var(--soft);opacity:1}
+.sainput:focus{border-color:var(--pink)}
+textarea.sainput{min-height:110px;resize:vertical}
+.sachoices{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.sachoices.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sachoice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:104px;padding:12px 8px;
+  border-radius:22px;border:3px solid var(--line);background:var(--pink-wash);color:var(--ink);cursor:pointer;text-align:center;font-weight:800;font-size:18px;line-height:1.15}
+.sachoice .sico{font-size:34px;line-height:1}
+.sachoice:active{transform:scale(.97)}
+.sachoice[aria-pressed="true"]{background:var(--pink);color:var(--on-pink);border-color:var(--pink-deep);box-shadow:inset 0 0 0 3px var(--pink-deep)}
+.sachoice[aria-pressed="true"] .stxt::after{content:" \2713"}
+.sasend{width:100%;min-height:72px;margin-top:24px;border:0;border-radius:999px;background:#9E1048;color:#FFFFFF;font-size:24px;font-weight:800;cursor:pointer}
+.sasend[aria-disabled="true"]{background:var(--line);color:var(--ink);cursor:not-allowed}
+.sasend:not([aria-disabled="true"]):active{transform:scale(.99)}
+.sahint{margin:12px 0 0;min-height:1.3em;text-align:center;font-weight:700;color:var(--pink-deep);font-size:18px}
+.sadone{text-align:center}
+.sadone .bigico{font-size:60px;line-height:1}
+.sadone h3{font-size:34px;font-weight:800;margin:8px 0 4px}
+.sadone > p{margin:0 0 18px;font-weight:600;color:var(--soft)}
+.sabadge{border-radius:22px;padding:16px;margin:0 auto 16px;max-width:560px;border:3px solid}
+.sabadge .t{font-weight:800;font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.sabadge .i{font-family:"Bricolage Grotesque","Figtree",sans-serif;font-size:28px;font-weight:800;margin-top:2px}
+.sabadge.low{background:#FFF3CD;border-color:#E0A800;color:#5C4300}
+.sabadge.out{background:#FDE8E8;border-color:#B3001B;color:#8A0014}
+.sabadge.broken{background:#FFE8D4;border-color:#C25E00;color:#7A3A00}
+.sabadge.other{background:#E8F0FF;border-color:#3D5FC4;color:#1A3FA8}
+.sasum{list-style:none;margin:0 auto 20px;padding:4px 18px;max-width:560px;background:var(--pink-wash);border-radius:20px;text-align:left}
+.sasum li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:2px solid var(--line);font-size:18px}
+.sasum li:last-child{border-bottom:0}
+.sasum span{color:var(--soft);font-weight:600}
+.sasum b{text-align:right}
+.sadone .btn{margin:0 auto}
+@media (max-width:700px){
+  .sachoices,.sachoices.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .alertview{padding:18px 16px 34px}
+  .sacard{padding:18px 16px 20px}
+}
 [hidden]{display:none !important}
 @media (prefers-reduced-motion: reduce){*{transition:none !important}}
 </style>
@@ -284,6 +338,11 @@ ol li::before{content:counter(s);position:absolute;left:0;top:12px;width:42px;he
     <a class="pcbanner" id="pcBanner" href="#prep-check" aria-describedby="pcSummary">
       <span class="pcico" aria-hidden="true">&#128203;</span>
       <span class="pctext"><b>Prep Check</b><span id="pcSummary">Loading stock counts&hellip;</span></span>
+      <span class="pcgo" aria-hidden="true">Open &#8250;</span>
+    </a>
+    <a class="pcbanner sabanner" id="saBanner" href="#staff-alert">
+      <span class="pcico" aria-hidden="true">&#128680;</span>
+      <span class="pctext"><b>Staff Alert</b><span>Running low, out of something, or equipment broken? Tell a manager here.</span></span>
       <span class="pcgo" aria-hidden="true">Open &#8250;</span>
     </a>
     <nav id="groups" aria-label="Recipes"></nav>
@@ -339,6 +398,55 @@ ol li::before{content:counter(s);position:absolute;left:0;top:12px;width:42px;he
     <ul class="pclist" id="pcList"></ul>
     <p class="pcnote" id="pcNote" role="status" hidden></p>
     <p class="pcfoot" id="pcFoot">Counts save on their own and show the same on every screen for this shop.</p>
+  </section>
+  <section class="alertview" id="alertView" aria-labelledby="saTitle">
+    <div class="bar"><a class="btn back" href="#home">&#8962; Home</a></div>
+    <div class="sahead">
+      <h2 id="saTitle">Staff Alert</h2>
+      <p>Let management know when something is low, out, or not working. It goes straight to their email.</p>
+    </div>
+
+    <form class="sacard" id="saForm" novalidate>
+      <label class="salabel" for="saName">Your first name</label>
+      <input class="sainput" type="text" id="saName" autocomplete="off" required aria-required="true">
+
+      <fieldset>
+        <legend class="salegend">Which shop</legend>
+        <div class="sachoices" id="saLoc">
+          <button type="button" class="sachoice" aria-pressed="false" data-v="Riverside"><span class="sico" aria-hidden="true">&#128205;</span><span class="stxt">Riverside</span></button>
+          <button type="button" class="sachoice" aria-pressed="false" data-v="Gallery at Tyler"><span class="sico" aria-hidden="true">&#128205;</span><span class="stxt">Galleria at Tyler</span></button>
+          <button type="button" class="sachoice" aria-pressed="false" data-v="Rancho Cucamonga"><span class="sico" aria-hidden="true">&#128205;</span><span class="stxt">Rancho</span></button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="salegend">What's going on</legend>
+        <div class="sachoices four" id="saType">
+          <button type="button" class="sachoice" aria-pressed="false" data-v="running-low"><span class="sico" aria-hidden="true">&#128201;</span><span class="stxt">Running low</span></button>
+          <button type="button" class="sachoice" aria-pressed="false" data-v="out-of-stock"><span class="sico" aria-hidden="true">&#128680;</span><span class="stxt">Completely out</span></button>
+          <button type="button" class="sachoice" aria-pressed="false" data-v="broken"><span class="sico" aria-hidden="true">&#128295;</span><span class="stxt">Broken or not working</span></button>
+          <button type="button" class="sachoice" aria-pressed="false" data-v="other"><span class="sico" aria-hidden="true">&#128221;</span><span class="stxt">Other note</span></button>
+        </div>
+      </fieldset>
+
+      <label class="salabel" for="saItem">Item or equipment</label>
+      <input class="sainput" type="text" id="saItem" placeholder="Nutella, waffle maker, cups" autocomplete="off" required aria-required="true">
+
+      <label class="salabel" for="saNotes">Extra details <span class="opt">(optional)</span></label>
+      <textarea class="sainput" id="saNotes" rows="3"></textarea>
+
+      <button type="submit" class="sasend" id="saSend" aria-disabled="true" aria-describedby="saHint">Send alert</button>
+      <p class="sahint" id="saHint" aria-live="polite"></p>
+    </form>
+
+    <div class="sacard sadone" id="saDone" hidden>
+      <div class="bigico" aria-hidden="true">&#9989;</div>
+      <h3 id="saDoneTitle" tabindex="-1">Alert sent</h3>
+      <p>Management has been notified. Thanks for keeping us in the loop.</p>
+      <div class="sabadge" id="saBadge"></div>
+      <ul class="sasum" id="saSum"></ul>
+      <button type="button" class="btn" id="saAgain">Report something else</button>
+    </div>
   </section>
 </div>
 
@@ -785,10 +893,93 @@ async function pcSave(name){
 setInterval(() => { if(!document.hidden && !Object.keys(PC.pending).length) pcLoad(); }, 20000);
 document.addEventListener("visibilitychange", () => { if(!document.hidden) pcLoad(); });
 
+
+/* ---------- Staff Alert ---------- */
+const SA_URL = "https://script.google.com/macros/s/AKfycbxIbDu3RR-MVqbezmpzph7gpXd6mAXt1UKOd6CLrD2Tk33QWXmga_xshmwn7otwIZvrow/exec";
+const SA_TYPES = {
+  "running-low":  {label:"Running Low", cls:"low"},
+  "out-of-stock": {label:"Completely Out", cls:"out"},
+  "broken":       {label:"Broken / Not Working", cls:"broken"},
+  "other":        {label:"General Note", cls:"other"}
+};
+const SA = {loc:null, type:null, sending:false};
+function saEsc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function saPick(groupId, val){
+  document.querySelectorAll("#"+groupId+" .sachoice").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === val)));
+}
+function saMissing(){
+  const m = [];
+  if(!$("saName").value.trim()) m.push("your first name");
+  if(!SA.loc) m.push("the shop");
+  if(!SA.type) m.push("what's going on");
+  if(!$("saItem").value.trim()) m.push("the item or equipment");
+  return m;
+}
+function saCheck(){
+  const ok = saMissing().length === 0;
+  $("saSend").setAttribute("aria-disabled", ok ? "false" : "true");
+  if(ok) $("saHint").textContent = "";
+}
+$("saLoc").addEventListener("click", e => {
+  const b = e.target.closest(".sachoice"); if(!b) return;
+  SA.loc = b.dataset.v; saPick("saLoc", SA.loc);
+  try { localStorage.setItem("psicy-alert-loc", SA.loc); } catch(err){}
+  saCheck();
+});
+$("saType").addEventListener("click", e => {
+  const b = e.target.closest(".sachoice"); if(!b) return;
+  SA.type = b.dataset.v; saPick("saType", SA.type); saCheck();
+});
+["saName","saItem"].forEach(id => $(id).addEventListener("input", saCheck));
+try { const saved = localStorage.getItem("psicy-alert-loc"); if(saved){ SA.loc = saved; saPick("saLoc", saved); } } catch(err){}
+
+$("saForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if(SA.sending) return;
+  const missing = saMissing();
+  if(missing.length){ $("saHint").textContent = "Please add " + missing.join(", ") + "."; return; }
+  const cfg = SA_TYPES[SA.type];
+  const entry = {
+    name: $("saName").value.trim(), alertType: cfg.label, alertTypeKey: SA.type,
+    item: $("saItem").value.trim(), notes: $("saNotes").value.trim(),
+    location: SA.loc, timestamp: new Date().toLocaleString()
+  };
+  SA.sending = true;
+  const btn = $("saSend"); btn.setAttribute("aria-disabled","true"); btn.textContent = "Sending...";
+  try {
+    await fetch(SA_URL, {method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body: JSON.stringify(entry)});
+  } catch(err){}
+  const badge = $("saBadge");
+  badge.className = "sabadge " + cfg.cls;
+  badge.innerHTML = `<div class="t">${saEsc(cfg.label)}</div><div class="i">${saEsc(entry.item)}</div>`;
+  const rows = [["Reported by", entry.name], ["Shop", entry.location], ["Time", entry.timestamp]];
+  if(entry.notes) rows.push(["Notes", entry.notes]);
+  $("saSum").innerHTML = rows.map(([k,v]) => `<li><span>${saEsc(k)}</span><b>${saEsc(v)}</b></li>`).join("");
+  $("saForm").hidden = true; $("saDone").hidden = false;
+  $("saDoneTitle").focus();
+});
+function saReset(){
+  $("saName").value = ""; $("saItem").value = ""; $("saNotes").value = "";
+  SA.type = null; saPick("saType", null);
+  SA.sending = false; $("saSend").textContent = "Send alert"; $("saHint").textContent = "";
+  $("saDone").hidden = true; $("saForm").hidden = false;
+  saCheck();
+}
+$("saAgain").addEventListener("click", () => { saReset(); $("saName").focus(); });
+
 function route(){
   const id = location.hash.slice(1);
   const d = drinks.find(x=>x.id===id);
   const app = $("app");
+  if(id === "staff-alert"){
+    app.classList.remove("showing","prepping"); app.classList.add("alerting"); current = null; PC.picking = false;
+    if(!$("saDone").hidden) saReset();
+    document.title = "Staff Alert | P.S. I Crepe You";
+    window.scrollTo(0,0);
+    const h = $("saTitle"); h.setAttribute("tabindex","-1"); h.focus({preventScroll:true});
+    return;
+  }
+  app.classList.remove("alerting");
   if(id === "prep-check" || id.startsWith("prep-check/")){
     app.classList.remove("showing"); app.classList.add("prepping"); current = null;
     PC.cat = id.startsWith("prep-check/") ? id.slice(11) : null;

@@ -1022,6 +1022,13 @@ pcLoad();
 route();
 </script>
 <!-- ===== TIDY REMINDER START (hourly restroom and front check) ===== -->
+<div id="tidyAdmin">
+  <button id="tidyAdminBtn" type="button" aria-expanded="false" aria-controls="tidyAdminMenu">Admin</button>
+  <div id="tidyAdminMenu" hidden>
+    <button id="tidyTestBtn" type="button">Test reminder</button>
+  </div>
+</div>
+
 <div id="tidyAlert" role="alertdialog" aria-modal="true" aria-labelledby="tidyTitle" aria-describedby="tidyText" hidden>
   <div class="tidy-box">
     <h2 id="tidyTitle">Tidy Check</h2>
@@ -1056,6 +1063,23 @@ route();
   @media (prefers-reduced-motion: no-preference) {
     #tidyAlert .tidy-box { animation: tidyPop .3s ease-out; }
     @keyframes tidyPop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  }
+  #tidyAdmin { position: fixed; top: 6px; right: 8px; z-index: 9000; text-align: right; }
+  #tidyAdminBtn {
+    background: transparent; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.8); font-size: 13px; font-family: inherit;
+    min-width: 44px; min-height: 44px; padding: 8px 10px;
+  }
+  #tidyAdminBtn:focus-visible, #tidyTestBtn:focus-visible { outline: 3px solid #ffffff; outline-offset: 2px; }
+  #tidyAdminMenu {
+    background: #ffffff; border-radius: 10px; padding: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  }
+  #tidyAdminMenu[hidden] { display: none; }
+  #tidyTestBtn {
+    background: #b8285a; color: #ffffff; border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 700; font-family: inherit;
+    min-height: 44px; padding: 10px 16px; cursor: pointer;
   }
 </style>
 
@@ -1121,6 +1145,19 @@ route();
 
   check();
   setInterval(check, 20000);
+
+  var adminBtn = document.getElementById('tidyAdminBtn');
+  var adminMenu = document.getElementById('tidyAdminMenu');
+  adminBtn.addEventListener('click', function () {
+    var open = adminMenu.hidden;
+    adminMenu.hidden = !open;
+    adminBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.getElementById('tidyTestBtn').addEventListener('click', function () {
+    adminMenu.hidden = true;
+    adminBtn.setAttribute('aria-expanded', 'false');
+    show();
+  });
 
   // Test: open the page with ?tidytest at the end of the address to show the alert right away
   if (/[?&]tidytest/.test(location.search)) show();

@@ -1121,6 +1121,9 @@ route();
 
   check();
   setInterval(check, 20000);
+
+  // Test: open the page with ?tidytest at the end of the address to show the alert right away
+  if (/[?&]tidytest/.test(location.search)) show();
 })();
 </script>
 <!-- ===== TIDY REMINDER END ===== -->

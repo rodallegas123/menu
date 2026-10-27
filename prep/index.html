@@ -1021,5 +1021,109 @@ renderMenu();
 pcLoad();
 route();
 </script>
+<!-- ===== TIDY REMINDER START (hourly restroom and front check) ===== -->
+<div id="tidyAlert" role="alertdialog" aria-modal="true" aria-labelledby="tidyTitle" aria-describedby="tidyText" hidden>
+  <div class="tidy-box">
+    <h2 id="tidyTitle">Tidy Check</h2>
+    <p id="tidyText">Go check the restroom and the front of the shop.</p>
+    <button id="tidyDone" type="button">Done</button>
+  </div>
+</div>
+
+<style>
+  #tidyAlert {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  #tidyAlert[hidden] { display: none; }
+  #tidyAlert .tidy-box {
+    background: #ffffff; color: #111111;
+    border: 6px solid #e8457a; border-radius: 20px;
+    padding: 40px 32px; max-width: 640px; width: 100%;
+    text-align: center; font-family: Jost, Arial, sans-serif;
+  }
+  #tidyTitle { font-size: 2.6rem; margin: 0 0 12px; }
+  #tidyText { font-size: 1.6rem; margin: 0 0 28px; line-height: 1.4; }
+  #tidyDone {
+    font-size: 1.8rem; font-weight: 700;
+    min-width: 220px; min-height: 72px;
+    background: #b8285a; color: #ffffff;
+    border: none; border-radius: 14px; cursor: pointer;
+  }
+  #tidyDone:focus-visible { outline: 4px solid #111111; outline-offset: 4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    #tidyAlert .tidy-box { animation: tidyPop .3s ease-out; }
+    @keyframes tidyPop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  }
+</style>
+
+<script>
+(function () {
+  var OPEN_HOUR = 11;         // first reminder every day (11 = 11:00 am)
+  var LAST_HOUR_MON_THU = 20; // close 9 pm, last reminder 8:00 pm
+  var LAST_HOUR_FRI_SUN = 21; // close 10 pm, last reminder 9:00 pm
+  var REPEAT_CHIME_MIN = 3;   // chime again every 3 min until Done is tapped
+
+  var alertEl = document.getElementById('tidyAlert');
+  var doneBtn = document.getElementById('tidyDone');
+  var chimeTimer = null;
+
+  function store(key, val) {
+    try { if (val === undefined) return localStorage.getItem(key); localStorage.setItem(key, val); }
+    catch (e) { return null; }
+  }
+
+  function chime() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.35, 0.7].forEach(function (t, i) {
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = [880, 1175, 1568][i];
+        g.gain.setValueAtTime(0.0001, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.6, ctx.currentTime + t + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t + 0.5);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.55);
+      });
+    } catch (e) {}
+  }
+
+  function show() {
+    alertEl.hidden = false;
+    doneBtn.focus();
+    chime();
+    clearInterval(chimeTimer);
+    chimeTimer = setInterval(chime, REPEAT_CHIME_MIN * 60000);
+  }
+
+  function hide() {
+    alertEl.hidden = true;
+    clearInterval(chimeTimer);
+  }
+
+  doneBtn.addEventListener('click', hide);
+
+  function check() {
+    var now = new Date();
+    var h = now.getHours();
+    var slot = now.toDateString() + ' ' + h;
+    var day = now.getDay(); // 0 Sun, 5 Fri, 6 Sat
+    var lastHour = (day === 0 || day === 5 || day === 6) ? LAST_HOUR_FRI_SUN : LAST_HOUR_MON_THU;
+    if (h < OPEN_HOUR || h > lastHour) return;
+    if (now.getMinutes() > 10) return;          // only fire in the first 10 min of the hour
+    if (store('tidyLastSlot') === slot) return; // already shown this hour
+    store('tidyLastSlot', slot);
+    show();
+  }
+
+  check();
+  setInterval(check, 20000);
+})();
+</script>
+<!-- ===== TIDY REMINDER END ===== -->
+
 </body>
 </html>

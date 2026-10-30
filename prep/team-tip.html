@@ -75,18 +75,29 @@
     const category = form.querySelector("input[name=category]:checked").value;
     btn.disabled = true; btn.textContent = "Sending...";
     say("Sending your tip.");
+    if (!navigator.onLine) {
+      say("The tablet is offline. Check the WiFi and try again.", "err");
+      btn.disabled = false; btn.textContent = "Send anonymously";
+      return;
+    }
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, message })
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ category, message }),
+        signal: AbortSignal.timeout(30000)
       });
+      if (res.status === 429) {
+        say("A lot of tips came in today. Please try again tomorrow.", "err");
+        return;
+      }
       if (!res.ok) throw new Error(res.status);
       form.reset();
+      msg.blur();
       say("Thank you. Your tip was received and will be delivered in a few days.", "ok");
       setTimeout(() => { say(""); }, 8000);
     } catch (err) {
-      say("Sorry, that did not go through. Please try again in a minute.", "err");
+      say("Sorry, that did not go through. Your tip is still in the box, so please try again in a minute.", "err");
     } finally {
       btn.disabled = false; btn.textContent = "Send anonymously";
     }

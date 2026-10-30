@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Tips</title>
+<style>
+  :root { --pink:#c2185b; --ink:#1d1d1f; --bg:#fff5f8; --card:#ffffff; --muted:#4a4a4a; --focus:#0b57d0; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); font-size:20px; line-height:1.5; }
+  main { max-width:760px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { color:var(--pink); font-size:2rem; margin:0 0 8px; }
+  p.lead { color:var(--muted); margin:0 0 20px; }
+  .card { background:var(--card); border-radius:18px; padding:24px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  label, legend { font-weight:700; display:block; margin-bottom:8px; }
+  fieldset { border:0; padding:0; margin:0 0 20px; }
+  .cats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; }
+  .cats input { position:absolute; opacity:0; }
+  .cats label { font-weight:600; border:2px solid var(--pink); border-radius:12px; padding:14px; text-align:center; cursor:pointer; margin:0; min-height:56px; }
+  .cats input:checked + label { background:var(--pink); color:#fff; }
+  .cats input:focus-visible + label { outline:4px solid var(--focus); outline-offset:2px; }
+  textarea { width:100%; min-height:180px; font:inherit; padding:14px; border:2px solid #767676; border-radius:12px; }
+  textarea:focus-visible, button:focus-visible, a:focus-visible { outline:4px solid var(--focus); outline-offset:2px; }
+  .hint { color:var(--muted); font-size:.9rem; margin:6px 0 20px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  button, .menu { font:inherit; font-weight:700; border-radius:12px; padding:14px 24px; min-height:56px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; }
+  button.send { background:var(--pink); color:#fff; border:0; }
+  button.send[disabled] { background:#8a8a8a; cursor:wait; }
+  .menu { background:#fff; color:var(--pink); border:2px solid var(--pink); }
+  #status { margin-top:20px; font-weight:700; min-height:1.5em; }
+  #status.ok { color:#1b5e20; } #status.err { color:#b00020; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Team Tips</h1>
+  <p class="lead">Share an idea or concern anonymously. Your words are reworded before anyone sees them, and they are sent days later at a random time. Nothing about you is saved.</p>
+
+  <form id="tipForm" class="card" novalidate>
+    <fieldset>
+      <legend>What is this about?</legend>
+      <div class="cats">
+        <input type="radio" name="category" id="c1" value="Idea" checked><label for="c1">Idea to improve</label>
+        <input type="radio" name="category" id="c2" value="Concern"><label for="c2">Something is off</label>
+        <input type="radio" name="category" id="c3" value="Procedure"><label for="c3">Not following procedure</label>
+        <input type="radio" name="category" id="c4" value="Other"><label for="c4">Other</label>
+      </div>
+    </fieldset>
+
+    <label for="message">Your tip</label>
+    <textarea id="message" name="message" maxlength="2000" required aria-describedby="msgHint"></textarea>
+    <p id="msgHint" class="hint">Keep it general. Skip names, dates, and shift details so it stays anonymous. Up to 2000 characters.</p>
+
+    <div class="row">
+      <button type="submit" class="send" id="sendBtn">Send anonymously</button>
+      <a class="menu" href="./">Back to prep</a>
+    </div>
+    <p id="status" role="status" aria-live="polite"></p>
+  </form>
+</main>
+
+<script>
+  const ENDPOINT = "https://psicy-team-tips.netlify.app/.netlify/functions/submit-tip";
+  const form = document.getElementById("tipForm");
+  const msg = document.getElementById("message");
+  const btn = document.getElementById("sendBtn");
+  const status = document.getElementById("status");
+
+  function say(text, cls) { status.textContent = text; status.className = cls || ""; }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = msg.value.trim();
+    if (!message) { say("Please write your tip first.", "err"); msg.focus(); return; }
+    const category = form.querySelector("input[name=category]:checked").value;
+    btn.disabled = true; btn.textContent = "Sending...";
+    say("Sending your tip.");
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category, message })
+      });
+      if (!res.ok) throw new Error(res.status);
+      form.reset();
+      say("Thank you. Your tip was received and will be delivered in a few days.", "ok");
+      setTimeout(() => { say(""); }, 8000);
+    } catch (err) {
+      say("Sorry, that did not go through. Please try again in a minute.", "err");
+    } finally {
+      btn.disabled = false; btn.textContent = "Send anonymously";
+    }
+  });
+</script>
+</body>
+</html>

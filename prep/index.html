@@ -500,6 +500,14 @@ const drinks = [
    steps:["Crumble the mazapanes by hand. Do not blend them.","Add the water, white sugar, brown sugar, crumbled mazapanes, and peanut powder to a pot.","Whisk well.","Bring to a very light simmer. Do not let it boil.","Take it off the heat and let it cool completely.","Add the vanilla and mix well."],
    notes:["Do not boil. A very light simmer only."],
    flags:["Card steps say vanilla syrup but the ingredient list says imitation vanilla. Confirm which one"]},
+  {id:"biscoff-sauce", name:"Biscoff Sauce", fam:"sauce", one:true, tag:"Pot",
+   ing:[["Brown sugar","2 1/4 cups"],["Water","3 3/4 cups"],["Biscoff cookie butter","2 3/4 cups"],["Salt","3 pinches (1/16 tsp each)"],["Cinnamon","1 tsp"],["Imitation vanilla","1 1/2 tbsp"]],
+   steps:["Add all the ingredients to a pot.","Whisk until well blended.","Bring to a light simmer, stirring every so often.","Take it off the heat and let it cool completely.","Once cooled, pour it into a bottle."],
+   flags:["Card says 2 3/4 Biscoff with no unit. Confirm it is 2 3/4 cups"]},
+  {id:"strawberry-crunch", name:"Strawberry Crunch", fam:"other", one:true, tag:"Food processor",
+   ing:[["Golden cookies","20"],["Liquid butter","1/4 cup ([[4]] tbsp)"],["Strawberry Jello","1 packet (3 oz each, use the whole packet)"],["Pink food coloring","3 drops"]],
+   steps:["Pulse the Golden cookies in the food processor until they are fine crumbs.","Do not add anything else to the food processor.","In a separate container, mix the liquid butter, the whole strawberry Jello packet, and the pink food coloring.","Add the cookie crumbs.","Mix well with a spatula until fully combined."],
+   flags:["Card was changed by hand to 3 drops of pink, but the printed steps still say 2 drops. Confirm 3"]},
 
   {id:"brown-sugar-syrup", name:"Brown Sugar Syrup", fam:"syrup", one:true, tag:"Saucepan",
    ing:[["Brown sugar","1 cup"],["Water","1 cup"],["Liquid butter","1 tbsp"],["Salt","1 pinch (1/16 tsp each)"],["Imitation vanilla","1 tsp"]],
@@ -530,6 +538,9 @@ const drinks = [
   {id:"chocolate-cream", name:"Chocolate Cream", fam:"cream", one:true, tag:"Hand mixer",
    ing:[["Milk","2 cups"],["Heavy cream","1/4 cup"],["Chocolate Jello mix","1 box (3.9 oz)"]],
    steps:["Add the milk, heavy cream, and chocolate Jello mix to a container.","Mix with the handheld mixer until smooth and creamy."]},
+  {id:"cheesecake-filling", name:"Cheesecake Filling", fam:"cream", one:true, tag:"Hand mixer",
+   ing:[["Heavy cream","1 cup"],["Milk","1 1/2 cups"],["Cheesecake Jello mix","1 box (3.4 oz)"]],
+   steps:["Add the heavy cream, milk, and cheesecake Jello mix to a container.","Mix with the handheld mixer until smooth and creamy."]},
 
   {id:"kadayif", name:"Kadayif", fam:"other", one:true, tag:"Pot",
    ing:[["Kadayif","1 box"],["Liquid butter","4 tbsp"]],
@@ -538,7 +549,7 @@ const drinks = [
    ing:[["Boiled water","4 cups"],["Gravy powder","1 cup"]],
    steps:["Whisk the powder into the boiled water until fully dissolved.","Microwave for 5 minutes.","Mix until it's a thick gravy consistency."]},
 ];
-const icons = {"crepe-batter":"🥞","pink-batter":"🥞","gluten-free-batter":"🌾","horchata":"🥛","strawberry-horchata":"🍓","fresas-milk":"🍓","lemonade":"🍋","fresas-sauce":"🍓","pistachio-sauce":"🥜","dulce-de-leche":"🍮","banana-sauce":"🍌","brown-sugar-syrup":"🤎","strawberry-syrup":"🍓","blueberry-syrup":"🫐","vanilla-cf":"☁️","strawberry-cf":"🍓","kadayif":"🪺","gravy":"🍲","halloween-batter":"🎃","mazapan-sauce":"🥜","pumpkin-syrup":"🎃","abuelita-syrup":"🍫","creme-brulee-cream":"🍮","chocolate-cream":"🍫"};
+const icons = {"crepe-batter":"🥞","pink-batter":"🥞","gluten-free-batter":"🌾","horchata":"🥛","strawberry-horchata":"🍓","fresas-milk":"🍓","lemonade":"🍋","fresas-sauce":"🍓","pistachio-sauce":"🥜","dulce-de-leche":"🍮","banana-sauce":"🍌","brown-sugar-syrup":"🤎","strawberry-syrup":"🍓","blueberry-syrup":"🫐","vanilla-cf":"☁️","strawberry-cf":"🍓","kadayif":"🪺","gravy":"🍲","halloween-batter":"🎃","mazapan-sauce":"🥜","pumpkin-syrup":"🎃","abuelita-syrup":"🍫","creme-brulee-cream":"🍮","chocolate-cream":"🍫","biscoff-sauce":"🍪","strawberry-crunch":"🍓","cheesecake-filling":"🍰"};
 const famIcon = {batter:"🥞",drink:"🥛",sauce:"🥄",syrup:"🫙",foam:"☁️",cream:"🍮",other:"🍳"};
 const iconOf = d => icons[d.id] || famIcon[d.fam] || "☕";
 const $ = id => document.getElementById(id);
@@ -604,7 +615,7 @@ function renderDrink(d){
 // ---------- Batch multiplier and ingredient check off ----------
 const STEPS = [0.5,1,2,3,4,5,6,7,8,9,10];
 const NUM = String.raw`\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?`;
-const SING = {cup:"cups",gallon:"gallons",can:"cans",box:"boxes",pitcher:"pitchers",pinch:"pinches",egg:"eggs",drop:"drops",scoop:"scoops",tablet:"tablets",container:"containers",spoon:"spoons"};
+const SING = {cup:"cups",gallon:"gallons",can:"cans",box:"boxes",pitcher:"pitchers",pinch:"pinches",egg:"eggs",drop:"drops",scoop:"scoops",tablet:"tablets",container:"containers",spoon:"spoons",packet:"packets"};
 const PLUR = Object.fromEntries(Object.entries(SING).map(([a,b])=>[b,a]));
 function parseNum(t){ t=t.trim(); let m;
   if((m=t.match(/^(\d+)\s+(\d+)\/(\d+)$/))) return +m[1] + m[2]/m[3];

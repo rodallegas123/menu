@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PSICY Galleria Drinks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFE3EC; --panel:#FFFFFF; --ink:#4E1230; --soft:#9A4A6C; --line:#FFC6D8;
+  --pink:#E8397A; --pink-deep:#B81E5A; --pink-wash:#FFF2F6; --on-pink:#FFFFFF;
+  --flag-bg:#FFF4D9; --flag-ink:#6B4300; --grp-bg:#E3F2D3; --grp-ink:#2C5216; --grp-line:#9CC97A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#2A0F1D; --panel:#3A1628; --ink:#FFE6EF; --soft:#E7A3C0; --line:#5C2442;
+    --pink:#FF6FA3; --pink-deep:#FF9CC0; --pink-wash:#44192F; --on-pink:#2A0F1D;
+    --flag-bg:#3D2E10; --flag-ink:#F7D58C; --grp-bg:#1F3517; --grp-ink:#CDEBB5; --grp-line:#4C7A33;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#2A0F1D; --panel:#3A1628; --ink:#FFE6EF; --soft:#E7A3C0; --line:#5C2442;
+  --pink:#FF6FA3; --pink-deep:#FF9CC0; --pink-wash:#44192F; --on-pink:#2A0F1D;
+  --flag-bg:#3D2E10; --flag-ink:#F7D58C; --grp-bg:#1F3517; --grp-ink:#CDEBB5; --grp-line:#4C7A33;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:19px;line-height:1.45;
+  -webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+h1,h2,h3{font-family:"Bricolage Grotesque","Figtree",system-ui,sans-serif;margin:0;line-height:1.08}
+button,input{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:4px solid var(--pink);outline-offset:3px;border-radius:10px}
+
+.app{min-height:100%}
+.app.showing .side{display:none}
+.app:not(.showing) .main{display:none}
+
+/* Home screen */
+.side{background:var(--pink);color:var(--on-pink);min-height:100vh;padding:24px 28px 40px}
+.top{display:flex;align-items:center;gap:24px;flex-wrap:wrap;max-width:1400px;margin:0 auto}
+.logo{background:#FFFFFF;border-radius:24px;padding:10px 18px;display:flex;justify-content:center;flex:0 0 auto}
+.logo img{display:block;width:190px;height:auto}
+.brand{flex:1 1 300px;min-width:0}
+.brand h1{font-size:38px;font-weight:800;letter-spacing:-0.01em}
+.brand p{margin:4px 0 12px;opacity:.9;font-weight:600;font-size:17px}
+.search input{width:100%;max-width:520px;min-height:58px;padding:0 20px;border-radius:18px;border:0;
+  background:rgba(255,255,255,.96);color:#4E1230;font-size:20px}
+.search input::placeholder{color:#B26A8A}
+#groups{max-width:1400px;margin:0 auto}
+.group{margin-top:28px}
+.group h2{display:inline-flex;align-items:center;gap:10px;font-size:28px;font-weight:800;margin:0 0 14px;padding:8px 22px 8px 14px;border-radius:999px;background:#9E1048;color:#FFFFFF;font-family:"Bricolage Grotesque","Figtree",sans-serif;letter-spacing:.01em;box-shadow:0 3px 0 rgba(80,0,30,.25)}
+.group h2 span{font-size:26px;line-height:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px}
+.tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  background:#FFFFFF;color:#4E1230;border-radius:26px;padding:16px 10px 14px;min-height:178px;
+  box-shadow:0 3px 0 rgba(120,10,50,.18)}
+.tile:active{transform:scale(.96)}
+.ico{width:76px;height:76px;border-radius:22px;background:#FFE3EC;display:grid;place-items:center;font-size:44px;line-height:1}
+.tile b{font-size:18px;line-height:1.15;font-weight:700}
+.tile small{font-size:13px;font-weight:700;color:#B81E5A;background:#FFF2F6;border-radius:99px;padding:3px 10px;margin-top:auto}
+.empty{margin:24px 4px;font-weight:700;font-size:19px}
+
+/* Drink pane */
+.main{padding:22px 34px 40px;position:relative;max-width:1300px;margin:0 auto}
+.bar{position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:3}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar .back{font-size:20px;padding:0 26px;background:var(--pink);color:var(--on-pink);border-color:var(--pink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:58px;min-width:58px;
+  padding:0 22px;border-radius:999px;background:var(--panel);border:3px solid var(--line);
+  font-weight:700;font-size:18px;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.arrows{display:flex;gap:10px;margin-left:auto}
+.arrows .btn{font-size:26px;padding:0 20px}
+.head{margin:18px 0 20px}
+.head .fam{font-weight:700;color:var(--pink-deep);font-size:18px}
+.head h2{font-size:clamp(38px,6vw,64px);font-weight:800;letter-spacing:-0.02em;margin-top:4px}
+.sizes{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:460px;background:var(--panel);
+  border:3px solid var(--line);border-radius:26px;padding:6px;margin-bottom:24px}
+.sizes button{min-height:72px;border:0;border-radius:20px;background:transparent;cursor:pointer;
+  font-family:"Bricolage Grotesque",sans-serif;font-size:30px;font-weight:800;color:var(--soft)}
+.sizes button[aria-pressed="true"]{background:var(--pink);color:var(--on-pink)}
+.sizes button:disabled{opacity:.4;cursor:not-allowed}
+.sizes button:disabled::after{content:"Not offered";display:block;font-family:"Figtree",sans-serif;font-size:13px;font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.card{background:var(--panel);border-radius:28px;padding:10px 24px 16px;border:3px solid var(--line)}
+.card h3{font-size:22px;font-weight:800;padding:14px 0 8px;color:var(--pink-deep)}
+table{width:100%;border-collapse:collapse}
+td{padding:14px 0;border-top:2px dashed var(--line);vertical-align:middle;font-size:20px}
+td.amt{text-align:right;padding-left:14px}
+td.amt span{display:inline-block;background:var(--pink-wash);color:var(--pink-deep);font-weight:800;
+  border-radius:14px;padding:6px 14px;font-size:21px}
+ol{margin:4px 0 0;padding:0;list-style:none;counter-reset:s}
+ol li{counter-increment:s;position:relative;padding:14px 0 14px 58px;border-top:2px dashed var(--line);font-size:20px;min-height:66px}
+ol li::before{content:counter(s);position:absolute;left:0;top:12px;width:42px;height:42px;border-radius:50%;
+  background:var(--pink);color:var(--on-pink);font-weight:800;display:grid;place-items:center;font-size:20px}
+.alert{margin:0 0 18px;background:#B3001B;color:#FFFFFF;border-radius:22px;padding:14px 22px;font-size:19px;font-weight:700;border:3px solid #7A0012}
+.alert strong{font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-right:6px}
+.flag{margin-top:22px;background:var(--flag-bg);color:var(--flag-ink);border-radius:22px;padding:16px 22px;font-size:17px}
+.flag strong{display:block;font-size:18px}
+.flag ul{margin:6px 0 0;padding-left:22px}
+.note{margin-top:22px;background:var(--pink-wash);color:var(--pink-deep);border:3px solid var(--pink);border-radius:22px;padding:14px 22px;font-size:18px;font-weight:700}
+.note strong{display:block;font-size:19px;font-weight:800}
+.note ul{margin:6px 0 0;padding-left:22px}
+.grp td{background:var(--grp-bg);color:var(--grp-ink);border-top-color:var(--grp-line);font-weight:700}
+.grp td:first-child{padding-left:.6em}
+.grp td:last-child{padding-right:.5em}
+.grp td.amt span{background:#FFFFFF;color:var(--grp-ink)}
+.grp tr.gh td{border-top:0;border-radius:.6em .6em 0 0;font-size:.85em;font-weight:800;letter-spacing:.02em;padding-top:.45em;padding-bottom:.35em}
+.grp tr:last-child td:first-child{border-radius:0 0 0 .6em}
+.grp tr:last-child td:last-child{border-radius:0 0 .6em 0}
+.grp + tbody tr:first-child td{border-top:0}
+.foam{margin-top:22px;background:var(--panel);color:var(--ink);border:3px solid var(--pink);border-radius:22px;padding:14px 22px;font-size:18px}
+.foam strong{display:block;font-size:19px;font-weight:800;color:var(--pink-deep)}
+.foam ul{margin:6px 0 0;padding-left:22px}
+.foam li b{color:var(--pink-deep)}
+.hint{text-align:center;color:var(--soft);font-weight:600;font-size:15px;margin-top:24px}
+
+@media (max-width:900px) and (orientation:portrait){ .cols{grid-template-columns:1fr} .main{padding:18px 18px 34px}
+  .bar{flex-wrap:wrap;position:static} .titlerow{order:3;width:100%} .titlerow .head{margin:14px 0 14px} }
+@media (max-width:560px){
+  .side{padding:18px 14px 30px}
+  .logo img{width:150px}
+  .brand h1{font-size:30px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+  .tile{min-height:150px;padding:12px 6px}
+  .ico{width:60px;height:60px;font-size:34px}
+  .tile b{font-size:16px}
+}
+
+/* Tablet sideways: whole recipe fits on one screen, no scrolling */
+@media (min-width:900px), (orientation:landscape) and (min-width:600px){
+  .app.showing{height:100vh;overflow:hidden}
+  .app.showing.tall{overflow-y:auto}
+  .main{min-height:100%;padding:10px 24px 10px;max-width:none}
+  .bar{position:static;padding:0}
+  .bar .btn{min-height:54px}
+  .bar{gap:22px;margin-bottom:12px}
+  .titlerow{display:flex;align-items:center;gap:22px;flex:1;min-width:0}
+  .arrows{margin-left:0}
+  .head .fam{font-size:15px}
+  #fitbody{font-size:18px}
+  .cols.wide{grid-template-columns:3fr 2fr}
+  .cols.wide .ingcols{display:grid;grid-template-columns:1fr 1fr;column-gap:1.1em;align-items:start}
+  .cols{gap:.9em;align-items:start}
+  .card{padding:.3em 1.1em .7em;border-radius:1.3em}
+  .card h3{font-size:1.1em;padding:.5em 0 .3em}
+  td{padding:.42em 0;font-size:1em}
+  td.amt{padding-left:.7em}
+  td.amt span{padding:.18em .6em;font-size:1.05em;border-radius:.7em}
+  ol li{padding:.45em 0 .45em 2.7em;min-height:2.7em;font-size:1em}
+  ol li::before{top:.4em;width:2em;height:2em;font-size:1em}
+  .titlerow .head{margin:0;flex:1;min-width:0}
+  .head h2{font-size:clamp(28px,3.4vw,44px)}
+  .titlerow .sizes{margin:0;flex:0 0 280px}
+  .sizes button{min-height:54px;font-size:24px}
+  .flag{margin-top:.5em;padding:.4em 1em;font-size:.78em;border-radius:1em}
+  .flag strong{display:inline;font-size:1em;margin-right:6px}
+  .flag ul{display:inline;padding:0;margin:0}
+  .flag li{display:inline}
+  .flag li+li::before{content:"  ·  "}
+  .note{margin-top:.5em;padding:.4em 1em;font-size:.84em;border-radius:1em}
+  .note strong{display:inline;font-size:1em;margin-right:6px}
+  .note ul{display:inline;padding:0;margin:0}
+  .note li{display:inline}
+  .note li+li::before{content:"  ·  "}
+  .foam{margin-top:.5em;padding:.4em 1em;font-size:.84em;border-radius:1em}
+  .foam strong{display:inline;font-size:1em;margin-right:6px}
+  .foam ul{display:inline;padding:0;margin:0}
+  .foam li{display:inline}
+  .foam li+li::before{content:"  ·  "}
+  .alert{margin:0 0 .5em;padding:.45em 1em;font-size:.95em;border-radius:1em}
+  .hint{display:none}
+}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+
+<style>
+/* Galleria kiosk: switch between Drinks and Prep and tools */
+.kswitch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+.kswitch a{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:10px 16px;border-radius:999px;
+  font-weight:700;font-size:20px;line-height:1.2;text-decoration:none;border:2px solid var(--pink-deep,#B81E5A);color:var(--pink-deep,#B81E5A);background:var(--panel,#fff)}
+.kswitch a[aria-current="page"]{background:var(--pink-deep,#B81E5A);color:var(--on-pink,#fff)}
+.kswitch a:focus-visible{outline:3px solid var(--ink,#4E1230);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <section class="side">
+    <nav class="kswitch" aria-label="Galleria tablet sections">
+      <a href="drinks.html" aria-current="page"><span aria-hidden="true">&#129380;</span>Drinks</a>
+      <a href="index.html" ><span aria-hidden="true">&#129379;</span>Prep and tools</a>
+    </nav>
+    <div class="top">
+      <div class="logo"><img src="data:image/webp;base64,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" alt="P.S. I Crepe You"></div>
+      <div class="brand">
+        <h1>Drink recipes</h1>
+        <p>Tap a drink to see how to make it</p>
+        <label class="search"><input id="q" type="search" placeholder="Find a drink or foam" aria-label="Find a drink" autocomplete="off"></label>
+      </div>
+    </div>
+    <nav id="groups" aria-label="Drinks"></nav>
+    <p class="empty" id="empty" hidden>Nothing matches that name. Clear the search to see everything.</p>
+  </section>
+
+  <main class="main" id="pane">
+    <div class="bar">
+      <a class="btn back" href="#home">&#8962; Home</a>
+    <div class="titlerow">
+        <div class="head">
+          <div class="fam" id="fam"></div>
+          <h2 id="dname"></h2>
+        </div>
+        <div class="sizes" role="group" aria-label="Cup size">
+          <button type="button" data-size="16">16 oz</button>
+          <button type="button" data-size="20">20 oz</button>
+        </div>
+      </div>
+      <div class="arrows">
+        <a class="btn" id="prev" aria-label="Previous drink">&#8249;</a>
+        <a class="btn" id="next" aria-label="Next drink">&#8250;</a>
+      </div>
+    </div>
+    <div id="fitbody">
+    <div class="alert" id="alert" role="alert" hidden><strong><span aria-hidden="true">⚠️ </span>Important</strong> <span id="alertText"></span></div>
+    <div class="cols">
+      <section class="card"><h3>Ingredients</h3><div class="ingcols"><table id="ing" aria-label="Ingredients"></table><table id="ing2" aria-label="More ingredients" hidden></table></div></section>
+      <section class="card"><h3>How to build</h3><ol id="steps"></ol></section>
+    </div>
+    <div class="foam" id="foam" hidden><strong>How to make the cold foam</strong><ul id="foamList"></ul></div>
+    <div class="note" id="note" hidden><strong>Reminder</strong><ul id="noteList"></ul></div>
+    <div class="flag" id="flag" hidden><strong>Still to confirm</strong><ul id="flagList"></ul></div>
+    </div>
+    <p class="hint">Swipe left or right to go to the next drink</p>
+  </main>
+</div>
+
+<script>
+const families = {fall:"Fall menu", latte:"Lattes", classic:"Iced classics", matcha:"Matcha", hot:"Hot drinks", frappe:"Frappes", refresh:"Refreshers and lemonades", shake:"Shakes", foam:"Cold foams", syrup:"House syrups"};
+// Each ingredient: [name, 16 oz amount, 20 oz amount]; null means not made in that size.
+// Items with one:true have no size switch: [name, amount]
+const I = "1/2 scoop";
+const drinks = [
+  // FALL
+  {id:"spanish-latte", name:"Spanish Latte", fam:"fall",
+   ing:[["Lechera","Drizzle",null],["Homemade pumpkin syrup","1 oz",null],["Espresso","2 shots",null],["Milk","4 oz",null],["Pumpkin pie spice","1/32 tsp (a smidge)",null],["Ice","1 scoop, top off if needed",null],["Pumpkin cold foam","Top",null],["Pumpkin pie spice","Sprinkle on foam",null]],
+   steps:["Drizzle Lechera in the cup.","Add the pumpkin syrup, espresso, milk, and a smidge of pumpkin pie spice.","Add ice and mix.","Top with pumpkin cold foam and sprinkle pumpkin pie spice over the foam."]},
+  {id:"pumpkin-chai", name:"Pumpkin Chai", fam:"fall",
+   ing:[["Pumpkin syrup","1 1/2 oz",null],["Vanilla","2 pumps",null],["Milk","4 oz",null],["Chai","4 oz",null],["Ice","1 scoop, top off if needed",null],["Pumpkin cold foam","2 oz",null]],
+   steps:["Add the pumpkin syrup and vanilla.","Add the milk, chai, and ice.","Top with 2 oz pumpkin cold foam."]},
+  {id:"pumpkin-banana-bread-latte", name:"Pumpkin Banana Bread Latte", fam:"fall",
+   ing:[["House made pumpkin syrup","1 oz",null],["Banana sauce","1 oz",null],["Banana powder","1/4 tsp",null],["Pumpkin pie spice","1/32 tsp (a smidgen)",null],["Espresso","2 shots",null],["Milk","4 oz",null],["Ice","1 scoop, top off if needed",null],["Pumpkin banana bread cold foam","Top",null],["Pumpkin spice seasoning","Sprinkle on top",null]],
+   steps:["Add the pumpkin syrup, banana sauce, banana powder, and pumpkin pie spice.","Add the espresso and milk, then mix.","Add ice.","Top with pumpkin banana bread cold foam and sprinkle pumpkin spice seasoning."]},
+  {id:"pumpkin-horchata", name:"Pumpkin Horchata", fam:"fall",
+   ing:[["Pumpkin syrup","1 oz",null],["Horchata","4 oz",null],["Espresso","2 shots",null],["Ice","1 scoop, top off if needed",null],["Pumpkin cold foam","Top",null],["Pumpkin spice","Sprinkle on top",null]],
+   steps:["Add the pumpkin syrup, horchata, and espresso.","Add ice.","Top with pumpkin cold foam (replaces whipped cream).","Sprinkle pumpkin spice on top."]},
+
+  // LATTES
+  {id:"banana-bread-latte", name:"Banana Bread Latte", fam:"latte",
+   ing:[["Banana sauce","3 oz",null],["Caramel syrup","1 pump",null],["Cinnamon","Sprinkle",null],["Espresso","2 shots",null],["Milk","4 oz",null],["Ice","1 scoop, top off if needed",null],["Banana bread cold foam","Top",null]],
+   steps:["Add the banana sauce, caramel syrup, and cinnamon.","Add the espresso and milk, then mix.","Add ice and top with banana bread cold foam."]},
+  {id:"biscoff-latte", name:"Biscoff Latte", fam:"latte",
+   ing:[["Biscoff sauce","Drizzle around cup","Drizzle around cup"],["Vanilla","1 pump","2 pumps"],["Caramel","1 pump","2 pumps"],["Biscoff crumbs","2 tbsp","3 tbsp"],["Espresso","2 shots","2 shots"],["Milk","4 oz","8 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Biscoff cold foam","Top","Top"],["Biscoff crumbs","On top","On top"]],
+   steps:["Drizzle Biscoff sauce around the cup.","Add the vanilla, caramel, Biscoff crumbs, and espresso, then mix.","Add the milk and ice.","Top with Biscoff cold foam and Biscoff crumbs."]},
+  {id:"dubai-latte", name:"Dubai Latte", fam:"latte",
+   ing:[["Nutella","Drizzle around cup",null],["Pistachio cream","1/2 oz",null],["Pistachio syrup","4 pumps",null],["Espresso","2 shots",null],["Milk","6 oz",null],["Ice",I,null],["Nutella cold foam","Top",null],["Kadayif and pistachio crumbs","On top",null]],
+   steps:["Drizzle Nutella around the cup.","Add the pistachio cream, pistachio syrup, and espresso, then mix.","Add the milk and ice.","Top with Nutella cold foam, kadayif, and pistachio crumbs."]},
+  {id:"rainbow-crunch-latte", name:"Rainbow Crunch Latte", fam:"latte",
+   ing:[["Lechera","Around the cup","Around the cup"],["Vanilla","2 pumps","4 pumps"],["Espresso","2 shots","2 shots"],["Milk","4 oz","8 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Strawberry cold foam","Top","Top"],["Fruity Pebbles","1 tsp","1 tsp"]],
+   steps:["Drizzle Lechera around the cup.","Add the vanilla and espresso, then mix.","Add the milk and ice.","Top with strawberry cold foam and Fruity Pebbles."]},
+  {id:"honey-vanilla-cinnamon-latte", name:"Honey Vanilla Cinnamon Latte", fam:"latte",
+   ing:[["Honey","1 oz","1 oz"],["Vanilla","2 pumps","3 pumps"],["Cinnamon","Sprinkle","Sprinkle"],["Espresso","2 shots","2 shots"],["Milk","6 oz","8 oz"],["Ice",I,"1 scoop"]],
+   steps:["Add the honey, vanilla, cinnamon, and espresso.","Add the milk and mix.","Add ice."]},
+  {id:"cinnamon-brown-sugar-latte", name:"Cinnamon Brown Sugar Latte", fam:"latte",
+   ing:[["Brown sugar syrup","1 1/2 oz","3 1/2 oz"],["Cinnamon","Sprinkle","Sprinkle"],["Espresso","2 shots","2 shots"],["Milk","4 oz","7 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Brown sugar cold foam","Top","Top"],["Cinnamon","On top","On top"]],
+   steps:["Add the brown sugar syrup, cinnamon, and espresso, then mix.","Add the milk and ice.","Top with brown sugar cold foam and cinnamon."]},
+  {id:"esponjita-latte", name:"Esponjita Latte", fam:"latte",
+   ing:[["Coconut syrup","4 pumps",null],["Vanilla","1 pump",null],["Espresso","2 shots",null],["Milk","4 oz",null],["Ice","1 scoop, top off if needed",null],["Strawberry cold foam","Top",null],["Coconut shavings","1/2 tsp",null],["Esponjita cookie","1 for garnish",null]],
+   steps:["Add the coconut syrup, vanilla, and espresso.","Add the 4 oz milk and mix.","Add ice and top with strawberry cold foam.","Finish with coconut shavings and an Esponjita cookie."]},
+  {id:"mazapan-latte", name:"Mazapan Latte", fam:"latte",
+   ing:[["Mazapan syrup","1 1/2 oz","2 oz"],["Mazapan crumbs","1 tsp","1 tsp"],["Hazelnut syrup","2 pumps","3 pumps"],["Espresso","2 shots","2 shots"],["Milk","5 oz","6 oz"],["Ice","Top off","Top off"],["Whipped cream","Top","Top"],["Mazapan crumbs (on top)","A smidge","A smidge"]],
+   steps:["Add the mazapan syrup, mazapan crumbs, and hazelnut syrup.","Drop in the shots and stir.","Pour in the milk (5 oz for 16 oz, 6 oz for 20 oz).","Top off with ice.","Add whipped cream, top with a smidge of mazapan crumbs, and put the lid on."]},
+  {id:"horchata-latte", name:"Horchata Latte", fam:"latte",
+   ing:[["Ice","Half cup","Half cup"],["Horchata (pitcher from fridge)","6 oz","7 oz"],["Espresso","1 shot","2 shots"],["Whipped cream","Top","Top"],["Cinnamon","Sprinkle on top","Sprinkle on top"]],
+   steps:["Get the horchata pitcher out of the fridge and mix it well.","Fill the cup halfway with ice.","Pour the horchata over the ice (6 oz for 16 oz, 7 oz for 20 oz).","Pour the espresso slowly over the top so it sits on top of the horchata (1 shot for 16 oz, 2 shots for 20 oz). Do NOT mix.","Add whipped cream and sprinkle cinnamon on top.","Put the lid on."],
+   notes:["Do not mix the espresso into the horchata. Espresso stays on top, horchata on the bottom"]},
+  {id:"caramel-macchiato", name:"Caramel Macchiato", fam:"latte",
+   ing:[["Vanilla syrup","3 pumps","4 pumps"],["Caramel sauce","Drizzle around cup","Drizzle around cup"],["Ice","Half cup","Half cup"],["Milk","6 oz","7 oz"],["Espresso","2 shots","2 shots"]],
+   steps:["Add the vanilla syrup to the cup (3 pumps for 16 oz, 4 pumps for 20 oz).","Drizzle caramel sauce around the inside of the cup.","Fill the cup halfway with ice.","Pour in the milk (6 oz for 16 oz, 7 oz for 20 oz).","Pour the 2 shots of espresso over the top. Do NOT mix. The milk and espresso should stay layered.","Put the lid on."]},
+
+  // ICED CLASSICS
+  {id:"espresso", name:"Espresso", fam:"classic", one:true, tag:"1 shot",
+   ing:[["Espresso","1 shot"],["Cup","Mini espresso to go cup + small lid"]],
+   steps:["Pull 1 shot of espresso.","Pour it into a mini espresso to go cup (it holds up to 2 shots) and put on the small lid.","Serve."],
+   notes:["Running low or out of mini espresso cups? Let someone know right away","If there are no mini cups, pour the shot into a 16 oz cup and tell the customer: \"Sorry, we ran out of our small espresso cups, so we poured it into a 16 oz cup.\""]},
+  {id:"iced-latte", name:"Iced Latte", fam:"classic",
+   ing:[["Syrup of choice","3 pumps","4 pumps"],["Milk","1 cup","1 1/4 cup"],["Ice","1 cup","1 1/2 cup"],["Espresso","2 shots","2 shots"],["Cold foam","Top","Top"]],
+   steps:["Add the syrup of choice.","Add the milk and mix.","Add the ice.","Pour the espresso over the top.","Top with cold foam."]},
+  {id:"iced-mexican-mocha", name:"Iced Mexican Mocha", fam:"classic",
+   ing:[["Abuelita syrup","1 1/2 oz","2 1/2 oz"],["Lechera","1/2 oz","1/2 oz"],["Espresso","2 shots","2 shots"],["Milk","5 oz","6 oz"],["Ice","Top off","Top off"],["Whipped cream","Top","Top"],["Abuelita chocolate","Sprinkle on whip","Sprinkle on whip"]],
+   steps:["Add the Abuelita syrup, Lechera, and espresso, then stir.","Pour in the milk (5 oz for 16 oz, 6 oz for 20 oz).","Top off with ice.","Top with whipped cream and sprinkle Abuelita chocolate."]},
+  {id:"iced-americano", name:"Iced Americano", fam:"classic",
+   ing:[["Ice","1 cup","1 1/4 cup"],["Cold water","Fill, leave room for shots","Fill, leave room for shots"],["Espresso","2 shots","2 shots"]],
+   steps:["Add the ice.","Fill with cold water, leaving room for the shots.","Add the espresso.","Mix the espresso and water together."],
+   notes:["If the customer wants flavoring, add 3 pumps for 16 oz or 4 pumps for 20 oz"]},
+  {id:"house-chai", name:"House Chai", fam:"classic",
+   ing:[["Vanilla","2 pumps","3 pumps"],["Cinnamon","1/2 tsp","1/2 tsp"],["Chai","1 cup","1 cup"],["Milk","2/3 cup","1 cup"],["Ice","1 cup","1 cup"]],
+   steps:["Add the vanilla and cinnamon.","Add the chai and milk, then mix.","Add the ice."]},
+
+  // MATCHA
+  {id:"banana-matcha", name:"Banana Matcha", fam:"matcha",
+   ing:[["Banana sauce","1 1/2 oz","2 1/2 oz"],["Banana powder","1/2 tsp","1 tsp"],["Matcha","2 tsp","3 tsp"],["Hot water","2 oz","2 oz"],["Milk","4 oz","7 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Banana cold foam","Top","Top"],["Nilla crumbs","On top","On top"]],
+   steps:["Add the banana sauce and banana powder to the cup.","Mix the matcha and hot water until smooth, then pour it in.","Add the milk and stir everything together until fully mixed.","Add the ice last, after everything is mixed.","Top with banana cold foam and Nilla crumbs."]},
+  {id:"biscoff-matcha", name:"Biscoff Matcha", fam:"matcha",
+   ing:[["Biscoff sauce","Drizzle around cup","Drizzle around cup"],["Vanilla","1 pump","2 pumps"],["Caramel","1 pump","2 pumps"],["Biscoff crumbs","2 tbsp","3 tbsp"],["Matcha","2 tsp","3 tsp"],["Water","2 oz","2 oz"],["Milk","4 oz","8 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Biscoff cold foam","Top","Top"],["Biscoff crumbs","On top","On top"]],
+   steps:["Drizzle Biscoff sauce around the cup.","Add the vanilla, caramel, and Biscoff crumbs.","Mix the matcha and water with a frother and add it.","Add the milk and ice.","Top with Biscoff cold foam and Biscoff crumbs."]},
+  {id:"brown-sugar-matcha", name:"Brown Sugar Matcha", fam:"matcha",
+   ing:[["Brown sugar syrup","1 1/2 oz","3 1/2 oz"],["Matcha","2 tsp","3 tsp"],["Water","2 oz","2 oz"],["Milk","4 oz","7 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Brown sugar cold foam","Top","Top"]],
+   steps:["Add the brown sugar syrup.","Add the matcha and water, then mix.","Add the milk and ice.","Top with brown sugar cold foam."]},
+  {id:"coconut-matcha", name:"Coconut Matcha", fam:"matcha",
+   ing:[["Coconut syrup","2 pumps","3 pumps"],["Vanilla","1 pump","1 pump"],["Matcha","2 tsp","3 tsp"],["Water","2 oz","2 oz"],["Milk","4 oz","8 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Coconut cold foam","Top","Top"],["Coconut shavings","1 tsp","1 tsp"]],
+   steps:["Add the coconut syrup and vanilla.","Mix the matcha and water until smooth and add it.","Add the milk, mix, then add ice.","Top with coconut cold foam and coconut shavings."]},
+  {id:"lavender-honey-matcha", name:"Lavender Honey Matcha", fam:"matcha",
+   ing:[["Lavender syrup","1 pump","1 pump"],["Honey","1 oz","1 oz"],["Matcha","2 tsp","2 tsp"],["Hot water","2 oz","2 oz"],["Milk","4 oz","8 oz"],["Ice","1 scoop, top off if needed","1 scoop"],["Lavender cold foam","Top","Top"]],
+   steps:["Add the lavender syrup and honey.","Mix the matcha and hot water with a frother and add it.","Add the milk and ice.","Top with lavender cold foam."]},
+  {id:"fresas-con-crema-matcha", name:"Fresas con Crema Matcha", fam:"matcha",
+   ing:[["Strawberries","2","3"],["Strawberry syrup","1/2 oz","1 oz"],["Fresas milk","4 oz","5 oz"],["Ice","1 scoop, top off if needed","1 scoop, top off if needed"],["Matcha","2 tsp","3 tsp"],["Water","2 oz","2 oz"],["Vanilla cold foam","Top","Top"]],
+   steps:["Grab a 16 oz or 20 oz cup.","Add the strawberries to the bottom of the cup.","Add the strawberry syrup, then smash the strawberries and syrup together.","Pour in the fresas milk.","Top off with ice. If the cup needs more, add more ice, not more liquid.","Mix the matcha and water until smooth and pour it over the top.","Top with vanilla cold foam."]},
+
+  {id:"matcha-latte", name:"Matcha Latte", fam:"matcha",
+   ing:[["Matcha (flat)","2 tsp","3 tsp"],["Hot water","2 oz","2 oz"],["Syrup of choice (optional, only if ordered)","3 pumps","4 pumps"],["Milk","1 1/2 cup","1 1/2 cup"],["Ice","1 cup","1 1/4 cup"]],
+   steps:["Mix the matcha and hot water until smooth. If the customer ordered syrup, mix it in now.","Add the milk and stir everything together.","Add the ice last."],
+   notes:["Syrup is optional. Only add it if the customer asked for it","If the kitchen display does not show a syrup, ask the customer: \"Just so you know, our matcha is organic and a little bitter on its own. Would you like any sweetener added?\""],
+   flags:["Old card says water for the 1 1/2 cup line; set to milk"]},
+  {id:"horchata-matcha", name:"Horchata Matcha", fam:"matcha",
+   ing:[["Matcha (flat)","2 tsp","3 tsp"],["Hot water","2 oz","2 oz"],["Ice","1 cup","1 1/4 cup"],["Horchata","1 1/2 cup","1 1/2 cup"]],
+   steps:["Mix the matcha and hot water until smooth.","Fill the cup with ice.","Pour in the horchata.","Pour the matcha over the top so it layers."]},
+  {id:"strawberry-horchata-matcha", name:"Strawberry Horchata Matcha", fam:"matcha",
+   ing:[["Matcha (flat)","2 tsp","3 tsp"],["Hot water","2 oz","2 oz"],["Ice","1 cup","1 1/4 cup"],["Strawberry horchata","1 1/2 cup","1 1/2 cup"]],
+   steps:["Mix the matcha and hot water until smooth.","Fill the cup with ice.","Mix the strawberry horchata well, then pour it in.","Pour the matcha over the top so it layers."]},
+
+  // HOT DRINKS
+  {id:"hot-latte", name:"Hot Latte", fam:"hot",
+   ing:[["Syrup of choice","3 pumps","4 pumps"],["Espresso","2 shots","2 shots"],["Milk (steamed)","1 2/3 cup","2 cups"],["Hot foam","Top","Top"]],
+   steps:["Add the syrup and espresso to the cup.","Steam the milk and pour it in.","Top with hot foam."]},
+  {id:"cappuccino", name:"Cappuccino", fam:"hot",
+   ing:[["Espresso","2 shots","2 shots"],["Hot milk","1 cup","1 1/4 cup"],["Hot foam","1 cup","1 1/4 cup"]],
+   steps:["Pull the espresso into the cup.","Pour in the hot milk.","Top with the hot foam."]},
+  {id:"hot-caramel-macchiato", name:"Hot Caramel Macchiato", fam:"hot",
+   ing:[["Caramel sauce","Drizzle in cup","Drizzle in cup"],["Vanilla","3 pumps","4 pumps"],["Milk (steamed)","1 2/3 cup","2 cups"],["Espresso","2 shots","2 shots"],["Hot foam","Splash","Splash"]],
+   steps:["Drizzle caramel sauce in the cup and add the vanilla.","Steam the milk and pour it in.","Pour the espresso over the top. Do NOT mix.","Finish with a splash of hot foam."]},
+  {id:"hot-mexican-mocha", name:"Hot Mexican Mocha", fam:"hot",
+   ing:[["Abuelita syrup","1 1/2 oz","2 1/2 oz"],["Lechera","1/2 oz","1/2 oz"],["Espresso","2 shots","2 shots"],["Milk (steamed)","1 1/2 cup","2 cups"],["Whipped cream","Top","Top"],["Abuelita chocolate","Sprinkle on whip","Sprinkle on whip"]],
+   flags:["Syrup amounts copied from the iced version. Confirm they taste right hot"],
+   steps:["Add the Abuelita syrup, Lechera, and espresso, then stir.","Steam the milk, pour it in, and stir.","Top with whipped cream and sprinkle Abuelita chocolate."]},
+  {id:"hot-mazapan-latte", name:"Hot Mazapan Latte", fam:"hot",
+   ing:[["Mazapan powder","2 tbsp","3 tbsp"],["Hazelnut","3 pumps","4 pumps"],["Espresso","2 shots","2 shots"],["Milk (steamed)","1 2/3 cup","2 cups"],["Whipped cream","Top","Top"],["Mazapan","Sprinkle on whip","Sprinkle on whip"]],
+   steps:["Add the mazapan powder, hazelnut, and espresso, then mix.","Steam the milk, pour it in, and stir.","Top with whipped cream and sprinkle mazapan."]},
+  {id:"hot-chocolate", name:"Hot Chocolate", fam:"hot",
+   ing:[["Abuelita powder","3 tbsp","4 tbsp"],["Condensed milk","1 tbsp","1 1/2 tbsp"],["Milk (steamed)","1 1/2 cup","2 1/4 cup"],["Whipped cream","Top","Top"],["Abuelita chocolate","Sprinkle on whip","Sprinkle on whip"]],
+   steps:["Add the Abuelita powder and condensed milk.","Steam the milk, pour it in, and stir until dissolved.","Top with whipped cream and sprinkle Abuelita chocolate."]},
+  {id:"hot-house-chai", name:"Hot House Chai", fam:"hot",
+   ing:[["Vanilla","2 pumps","3 pumps"],["Cinnamon","1/2 tsp","1/2 tsp"],["Chai","1 cup","1 1/4 cup"],["Milk (steamed)","1 cup","1 1/4 cup"]],
+   steps:["Add the vanilla and cinnamon.","Heat the chai and milk together and pour in.","Stir."]},
+  {id:"hot-americano", name:"Hot Americano", fam:"hot",
+   ing:[["Hot water","1 2/3 cup","2 cups"],["Espresso","2 shots","2 shots"]],
+   steps:["Fill with hot water, leaving room for the shots.","Add the espresso.","Mix the espresso and water together."],
+   notes:["If the customer wants flavoring, add 3 pumps for 16 oz or 4 pumps for 20 oz"]},
+
+  // FRAPPES (20 oz only)
+  {id:"horchata-frappe", name:"Horchata Frappe", fam:"frappe", price:"$7.00",
+   ing:[["Espresso (cooled)",null,"1 shot"],["Lechera",null,"1/2 oz"],["Horchata concentrate",null,"1/2 oz"],["Frappe syrup",null,"1 oz"],["Cinnamon",null,"1/4 tsp or 1 pump"],["Ice",null,"2 cups (one full 16 oz cup)"],["Horchata",null,"4 oz"],["Whipped cream and cinnamon",null,"Top"]],
+   steps:["Pull 1 shot of espresso and let it cool down.","Add everything to the blender with the ice and horchata.","Blend for 20 seconds.","Top with whipped cream and cinnamon."]},
+  {id:"fresas-con-crema-frappe", name:"Fresas con Crema Frappe", fam:"frappe", price:"$7.50",
+   ing:[["Strawberry syrup",null,"2 oz"],["Frappe syrup",null,"1 oz"],["Strawberry puree",null,"1 oz"],["Ice",null,"2 cups (one full 16 oz cup)"],["Fresas milk",null,"4 oz"],["Strawberries",null,"3, mashed in cup"],["Strawberry puree",null,"Drizzle"],["Whipped cream",null,"Top"],["Strawberry syrup",null,"Drizzle on top"]],
+   steps:["Add the strawberry syrup, frappe syrup, strawberry puree, ice, and fresas milk to the blender.","Blend for 20 seconds.","Mash 3 strawberries at the bottom of the cup and drizzle strawberry puree.","Pour in the frappe, top with whipped cream, and drizzle strawberry syrup on top."]},
+  {id:"banana-horchata-frappe", name:"Banana Horchata Frappe", fam:"frappe", price:"$7.00",
+   ing:[["Banana",null,"1 whole"],["Banana sauce",null,"1 oz"],["Horchata concentrate",null,"1/2 oz"],["Frappe syrup",null,"1 oz"],["Cinnamon",null,"1/4 tsp or 1 pump"],["Ice",null,"2 cups (one full 16 oz cup)"],["Horchata",null,"4 oz"],["Whipped cream",null,"Top"]],
+   steps:["Add everything to the blender with the ice and horchata.","Blend for 20 seconds.","Top with whipped cream."]},
+  {id:"biscoff-frappe", name:"Biscoff Frappe", fam:"frappe", price:"$7.50",
+   alert:"Drop the espresso shot over the ice cubes in the metal shot cup. Never pour a hot shot straight into the blender with the ice and mix.",
+   ing:[["Ice cubes in metal shot cup",null,"2 cubes"],["Espresso",null,"1 shot"],["Biscoff sauce",null,"1 1/2 oz"],["Biscoff crumbs",null,"1 tbsp"],["Frappe syrup",null,"1 oz"],["Ice",null,"2 cups (one full 16 oz cup)"],["Milk",null,"3 oz"],["Caramel",null,"2 pumps"],["Vanilla",null,"2 pumps"],["Biscoff sauce",null,"Drizzle around cup"],["Biscoff crumbles",null,"1 tbsp, base of cup"],["Whipped cream",null,"Top"],["Biscoff crumbles",null,"Sprinkle on whipped cream"]],
+   steps:["Grab the metal shot cup and put a couple ice cubes in it.","Pour 1 shot of espresso right over the ice so it cools down.","Add the espresso and all the other ingredients to the blender cup.","Blend for 20 seconds.","Grab a cup. Drizzle Biscoff sauce around the cup and put crumbs at the base.","Pour the drink into the cup.","Top with whipped cream.","Sprinkle Biscoff crumbles over the whipped cream."]},
+
+  // REFRESHERS AND LEMONADES
+  {id:"sunset-splash", name:"Sunset Splash Refresher", fam:"refresh",
+   ing:[["Mango syrup","3 pumps","4 pumps"],["Ice",I,I],["Green tea","Half of remaining space","Half of remaining space"],["Lemonade","Half of remaining space","Half of remaining space"],["Strawberry syrup","1 oz","1 1/2 oz"]],
+   steps:["Add the mango syrup and ice.","Fill the rest of the cup with equal parts green tea and lemonade, then mix.","Finish with strawberry syrup."]},
+  {id:"strawberry-mint-lemonade", name:"Strawberry Mint Lemonade", fam:"refresh",
+   ing:[["Mint",null,"5 good pieces"],["Honey",null,"1 oz"],["Strawberry syrup",null,"1 oz"],["Strawberries",null,"3"],["Ice",null,I],["Lemonade",null,"Fill remaining space"]],
+   steps:["Mash the mint, honey, strawberry syrup, and strawberries together.","Add ice, fill with lemonade, and mix."]},
+  {id:"mango-green-tea-lemonade", name:"Mango Green Tea Lemonade", fam:"refresh",
+   ing:[["Mint",null,"5 good pieces"],["Honey",null,"1 oz"],["Mango puree",null,"1 1/2 oz"],["Ice",null,I],["Green tea",null,"Half of remaining space"],["Lemonade",null,"Half of remaining space"],["Frozen mango",null,"1/4 cup"]],
+   steps:["Mash the mint, honey, and mango puree together.","Add ice, then equal parts green tea and lemonade.","Mix and add the frozen mango."]},
+  {id:"blueberry-lemonade", name:"Blueberry Lemonade", fam:"refresh",
+   ing:[["Mint",null,"5 good pieces"],["Blueberry syrup",null,"3 pumps"],["Honey",null,"1 oz"],["Frozen blueberries",null,"1/4 cup"],["Ice",null,I],["Lemonade",null,"Fill remaining space"]],
+   steps:["Mash the mint, blueberry syrup, honey, and frozen blueberries together.","Add ice, fill with lemonade, and mix."]},
+
+  // SHAKES
+  {id:"biscoff-shake", name:"Biscoff Shake", fam:"shake", one:true, tag:"16 oz, soft serve",
+   ing:[["Biscoff sauce","Drizzle around cup"],["Biscoff crumbs","Bottom of cup"],["Soft serve","Fill to the middle"],["Biscoff crumbs + 1 squeeze sauce","Middle layer"],["Soft serve","Fill to the top"],["Milk","Only if too thick, a splash"],["Whipped cream","Top"],["Biscoff crumbs","On top"]],
+   steps:["Drizzle Biscoff sauce around the inside of a 16 oz cup.","Add Biscoff crumbs to the bottom.","Fill with soft serve to about the middle of the cup.","Add more Biscoff crumbs and a squeeze of Biscoff sauce.","Fill the rest of the cup with soft serve.","Mix on the shake mixer, moving the cup around. Add a splash of milk only if it's too thick.","Use the espresso stir stick to finish mixing.","Top with whipped cream and Biscoff crumbs."]},
+
+  {id:"vanilla-shake", name:"Vanilla Shake", fam:"shake", one:true, tag:"16 oz, soft serve",
+   ing:[["Soft serve","Fill a 16 oz cup"],["Milk","Only if too thick, a splash"]],
+   steps:["Grab a 16 oz cup and fill it with soft serve.","Take it to the shake mixer and mix, moving the cup around.","No milk needed. If it's too thick, add a splash of milk.","Use the espresso stir stick to whip it and get everything evenly mixed in the cup."]},
+  {id:"mazapan-shake", name:"Mazapan Shake", fam:"shake", one:true, tag:"16 oz, soft serve",
+   ing:[["Mazapan crumbs","Bottom of cup"],["Soft serve","Fill to the middle"],["Mazapan crumbs","Middle layer"],["Soft serve","Fill to the top"],["Milk","Only if too thick, a splash"]],
+   steps:["Add mazapan crumbs to the bottom of a 16 oz cup.","Fill with soft serve to about the middle of the cup.","Add more mazapan crumbs.","Fill the rest of the cup with soft serve.","Mix on the shake mixer, moving the cup around. Add a splash of milk only if it's too thick.","Use the espresso stir stick to finish mixing."]},
+  {id:"oreo-shake", name:"Oreo Shake", fam:"shake", one:true, tag:"16 oz, soft serve",
+   ing:[["Oreo crumbs","Bottom of cup"],["Soft serve","Fill to the middle"],["Oreo crumbs","Middle layer"],["Soft serve","Fill to the top"],["Milk","Only if too thick, a splash"]],
+   steps:["Add Oreo crumbs to the bottom of a 16 oz cup.","Fill with soft serve to about the middle of the cup.","Add more Oreo crumbs.","Fill the rest of the cup with soft serve.","Mix on the shake mixer, moving the cup around. Add a splash of milk only if it's too thick.","Use the espresso stir stick to finish mixing."]},
+  {id:"strawberry-shake", name:"Strawberry Shake", fam:"shake", one:true, tag:"Thrifty ice cream",
+   ing:[["Thrifty strawberry ice cream","4 nice scoops"],["Milk","1/3 cup"]],
+   steps:["Put 4 nice scoops of strawberry ice cream and 1/3 cup milk into the shake cup.","Mix on the shake mixer until smooth.","Pour into the serving cup."]},
+  {id:"chocolate-shake", name:"Chocolate Shake", fam:"shake", one:true, tag:"Thrifty ice cream",
+   ing:[["Thrifty chocolate ice cream","4 nice scoops"],["Milk","1/3 cup"]],
+   steps:["Put 4 nice scoops of chocolate ice cream and 1/3 cup milk into the shake cup.","Mix on the shake mixer until smooth.","Pour into the serving cup."]},
+
+  // COLD FOAMS
+  {id:"pumpkin-cf", name:"Pumpkin Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Pumpkin syrup","1/2 oz"]],
+   steps:["Mix the pumpkin syrup into the vanilla cold foam."]},
+  {id:"pumpkin-banana-bread-cf", name:"Pumpkin Banana Bread Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Banana sauce","1/4 oz (1 1/2 tsp)"],["Pumpkin syrup","1/4 oz (1 1/2 tsp)"]],
+   steps:["Measure with a teaspoon, or fill the 1/2 oz side of the ounce cup halfway with banana sauce and halfway with pumpkin syrup.","Mix into the vanilla cold foam."]},
+  {id:"banana-cf", name:"Banana Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Banana powder","1 tsp"]],
+   steps:["Mix the banana powder into the vanilla cold foam."]},
+  {id:"banana-bread-cf", name:"Banana Bread Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Banana sauce","1 1/2 oz"]],
+   steps:["Mix the banana sauce into the vanilla cold foam."]},
+  {id:"biscoff-cf", name:"Biscoff Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Biscoff sauce","1 squeeze"]],
+   steps:["Mix the Biscoff sauce into the vanilla cold foam."]},
+  {id:"brown-sugar-cf", name:"Brown Sugar Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Brown sugar syrup","1 oz"],["Vanilla cold foam","2 oz"]],
+   steps:["Mix the brown sugar syrup into the vanilla cold foam."]},
+  {id:"lavender-cf", name:"Lavender Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Lavender syrup","3 pumps"],["Purple food coloring","1 drop"]],
+   steps:["Mix the lavender syrup and food coloring into the vanilla cold foam."]},
+  {id:"coconut-cf", name:"Coconut Cold Foam", fam:"foam", one:true, tag:"Per drink",
+   ing:[["Vanilla cold foam","2 oz"],["Coconut syrup","3 pumps"]],
+   steps:["Mix the coconut syrup into the vanilla cold foam."]},
+
+  // SYRUPS
+  {id:"frappe-syrup", name:"Frappe Syrup", fam:"syrup", one:true, tag:"Batch",
+   ing:[["Hot water","1 cup"],["Sugar","1 cup"],["Xanthan gum","3/4 tsp"],["Salt","1/4 tsp"]],
+   steps:["Mix the xanthan gum into the dry sugar first.","Slowly mix the sugar mixture into a bowl with the hot water.","Add the salt and mix until smooth.","Let cool and put into a bottle."]},
+  {id:"blueberry-syrup", name:"Blueberry Syrup", fam:"syrup", one:true, tag:"Batch",
+   ing:[["Frozen blueberries","3 cups"],["Water","3 cups"],["Sugar","1 1/2 cups"]],
+   steps:["Simmer everything for 10 minutes.","Blend with the immersion blender.","Strain."]}
+];
+
+const icons = {
+  "spanish-latte":"🎃","pumpkin-chai":"🎃","pumpkin-banana-bread-latte":"🎃","pumpkin-horchata":"🎃",
+  "banana-bread-latte":"🍞","biscoff-latte":"🍪","dubai-latte":"🍫","rainbow-crunch-latte":"🌈",
+  "honey-vanilla-cinnamon-latte":"🍯","cinnamon-brown-sugar-latte":"🤎","esponjita-latte":"🥥","mazapan-latte":"🥜","horchata-latte":"🥛",
+  "banana-matcha":"🍌","biscoff-matcha":"🍪","brown-sugar-matcha":"🍵","coconut-matcha":"🥥","lavender-honey-matcha":"💜","fresas-con-crema-matcha":"🍓",
+  "horchata-frappe":"🥛","fresas-con-crema-frappe":"🍓","banana-horchata-frappe":"🍌","biscoff-frappe":"🍪",
+  "sunset-splash":"🌅","strawberry-mint-lemonade":"🍓","mango-green-tea-lemonade":"🥭","blueberry-lemonade":"🫐",
+  "biscoff-shake":"🥤","vanilla-shake":"🍦","mazapan-shake":"🥜","oreo-shake":"🍪","strawberry-shake":"🍓","chocolate-shake":"🍫",
+  "pumpkin-cf":"🎃","pumpkin-banana-bread-cf":"🎃","banana-cf":"🍌","banana-bread-cf":"🍞","biscoff-cf":"🍪","brown-sugar-cf":"🤎","lavender-cf":"💜","coconut-cf":"🥥",
+  "frappe-syrup":"🧂","espresso":"☕","iced-latte":"🧊","iced-mexican-mocha":"🍫","iced-americano":"🧊","house-chai":"🫖","matcha-latte":"🍵","horchata-matcha":"🥛","strawberry-horchata-matcha":"🍓","hot-latte":"☕","cappuccino":"☕","hot-caramel-macchiato":"🍮","hot-mexican-mocha":"🍫","hot-mazapan-latte":"🥜","hot-chocolate":"🍫","hot-house-chai":"🫖","hot-americano":"☕","caramel-macchiato":"🍮","blueberry-syrup":"🫐"
+};
+const famIcon = {fall:"🎃",latte:"☕",classic:"🧊",hot:"🔥",matcha:"🍵",frappe:"🥤",refresh:"🍋",shake:"🥤",foam:"☁️",syrup:"🫙"};
+const iconOf = d => icons[d.id] || famIcon[d.fam] || "☕";
+const $ = id => document.getElementById(id);
+const sizesOf = d => d.one ? [] : ["16","20"].filter(s => d.ing.some(r => r[s==="16"?1:2] !== null));
+const phone = () => window.matchMedia("(max-width:720px)").matches;
+let ingBuild = ()=>{}, ingRows = 0;
+let size = "16", current = null;
+try { size = localStorage.getItem("psicy-size") || "16"; } catch(e){}
+
+function renderMenu(filter=""){
+  const f = filter.trim().toLowerCase();
+  const g = $("groups"); g.innerHTML = "";
+  let shown = 0;
+  Object.entries(families).forEach(([key,label])=>{
+    const list = drinks.filter(d => d.fam===key && (d.name+" "+families[d.fam]).toLowerCase().includes(f));
+    if(!list.length) return;
+    shown += list.length;
+    const sec = document.createElement("div");
+    sec.className = "group";
+    sec.innerHTML = `<h2><span aria-hidden="true">${famIcon[key]}</span>${label}</h2>`;
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    list.forEach(d=>{
+      const a = document.createElement("a");
+      a.className = "tile"; a.href = "#" + d.id;
+      const s = sizesOf(d);
+      a.innerHTML = `<span class="ico" aria-hidden="true">${iconOf(d)}</span><b>${d.name}</b><small>${d.one ? (d.tag||"") : (s.length===2 ? "16 / 20 oz" : s[0]+" oz")}</small>`;
+      grid.appendChild(a);
+    });
+    sec.appendChild(grid);
+    g.appendChild(sec);
+  });
+  $("empty").hidden = shown > 0;
+}
+
+// Automatic reminders: shake house syrups and sauces, froth cold foam
+function notesOf(d){
+  const out = (d.notes||[]).slice();
+  const houseMade = d.ing.filter(r=>/syrup|sauce/i.test(r[0]) && r.slice(1).some(a=>a && /\boz\b/i.test(a)))
+    .map(r=>r[0].replace(/^(home ?made|house ?made)\s+/i,"").toLowerCase().replace(/\b(abuelita|biscoff)\b/g,w=>w[0].toUpperCase()+w.slice(1)));
+  const uniq = [...new Set(houseMade)];
+  if (d.fam==="syrup") out.push("House made. Shake the bottle well before every pour");
+  else if (uniq.length) out.push("Shake the " + uniq.join(" and ") + " well before pouring");
+  const hasFoam = d.fam==="foam" || d.ing.some(r=>/cold foam/i.test(r[0]));
+  if (d.fam==="foam") out.push("Shake the cold foam bottle and listen for the spring ball rattling inside. No rattle means the ball is missing and the foam won't get thick, so replace it before using");
+  if (hasFoam) out.push("If the cold foam is runny or watery after mixing flavors, froth it with the frother until thick before pouring");
+  if (d.ing.some(r=>/strawberry horchata/i.test(r[0]))) out.push("Mix the strawberry horchata before pouring. It settles while it sits");
+  return out;
+}
+
+// Flavored cold foams: show the foam recipe on the drink so it can be made on the same page
+function foamsOf(d){
+  if (d.fam==="foam") return [];
+  const out=[];
+  d.ing.forEach(r=>{
+    const n=r[0].toLowerCase().trim();
+    if(!/cold foam$/.test(n) || /^(vanilla |strawberry )?cold foam$/.test(n)) return;
+    const f=drinks.find(x=>x.fam==="foam" && x.name.toLowerCase()===n);
+    if(!f || out.includes(f)) return;
+    out.push(f);
+  });
+  return out.map(f=>`<li><b>${f.name}:</b> ${f.ing.map(r=>r[1]+" "+r[0].toLowerCase().replace("biscoff","Biscoff")).join(" + ")}. ${f.steps.join(" ")}</li>`);
+}
+
+function renderDrink(d){
+  current = d;
+  const i = drinks.indexOf(d);
+  $("fam").textContent = families[d.fam] + (d.price ? "  ·  " + d.price : "");
+  document.querySelector(".sizes").hidden = !!d.one;
+  $("dname").textContent = d.name;
+  document.title = d.name + " | P.S. I Crepe You";
+  const avail = sizesOf(d);
+  const cur = avail.includes(size) ? size : avail[0];
+  document.querySelectorAll(".sizes button").forEach(b=>{
+    const s = b.dataset.size;
+    b.disabled = !avail.includes(s);
+    b.setAttribute("aria-pressed", String(s===cur));
+    b.onclick = () => { if(b.disabled) return; size = s; try{localStorage.setItem("psicy-size", s);}catch(e){} renderDrink(d); };
+  });
+  const col = d.one ? 1 : (cur==="16" ? 1 : 2);
+  const row = r=>`<tr><td>${r[0]}</td><td class="amt"><span${r[col].length<=12?' style="white-space:nowrap"':''}>${r[col]}</span></td></tr>`;
+  const rows = d.ing.filter(r=>r[col]!==null);
+  // Matcha drinks: matcha, water and simple syrup are whisked together first, so group them
+  const isPrep = r => d.fam==="matcha" && /^(matcha|hot water|water|simple syrup|syrup of choice)\b/i.test(r[0]);
+  const prep = rows.filter(isPrep), rest = rows.filter(r=>!isPrep(r));
+  const grpHtml = prep.length ? `<tbody class="grp"><tr class="gh"><td colspan="2"><span aria-hidden="true">🍵 </span>Matcha prep: whisk these together first</td></tr>${prep.map(row).join("")}</tbody>` : "";
+  // Long lists can split into two side by side columns so the text stays big
+  ingBuild = wide => {
+  document.querySelector(".cols").classList.toggle("wide", wide);
+  const firstCount = wide ? Math.max(0, Math.ceil((rows.length + (prep.length?1:0)) / 2) - (prep.length ? prep.length + 1 : 0)) : rest.length;
+  $("ing").innerHTML = grpHtml + `<tbody>${rest.slice(0, firstCount).map(row).join("")}</tbody>`;
+  $("ing2").innerHTML = `<tbody>${rest.slice(firstCount).map(row).join("")}</tbody>`;
+  $("ing2").hidden = !wide;
+  };
+  ingRows = rows.length;
+  ingBuild(false);
+  $("steps").innerHTML = d.steps.map(s=>`<li>${s}</li>`).join("");
+  const foams = foamsOf(d);
+  $("foam").hidden = !foams.length;
+  $("foamList").innerHTML = foams.join("");
+  const notes = notesOf(d);
+  $("note").hidden = !notes.length;
+  $("noteList").innerHTML = notes.map(n=>`<li>${n}</li>`).join("");
+  $("alert").hidden = !d.alert;
+  $("alertText").textContent = d.alert || "";
+  $("flag").hidden = !(d.flags && d.flags.length);
+  $("flagList").innerHTML = (d.flags||[]).map(f=>`<li>${f}</li>`).join("");
+  refit(); setTimeout(refit, 350);
+  $("prev").href = "#" + drinks[(i-1+drinks.length)%drinks.length].id;
+  $("next").href = "#" + drinks[(i+1)%drinks.length].id;
+}
+
+// Shrink the recipe text just enough that everything fits on one screen, no scrolling
+function isSideways(){ return window.innerWidth >= 900 || (window.innerWidth > window.innerHeight && window.innerWidth >= 600); }
+function fitScreen(){
+  const app = $("app"), body = $("fitbody");
+  body.style.fontSize = ""; app.classList.remove("tall");
+  if(!current || !isSideways()){ ingBuild(false); return; }
+  const fits = px => { body.style.fontSize = px + "px"; return body.getBoundingClientRect().bottom <= window.innerHeight - 8; };
+  ingBuild(false);
+  if(fits(18)) return;
+  if(ingRows >= 9 && !fits(15.5)){ ingBuild(true); if(fits(18)) return; }
+  let lo = 10, hi = 18;
+  if(!fits(lo)){ app.classList.add("tall"); return; }
+  for(let k=0; k<8; k++){ const m=(lo+hi)/2; if(fits(m)) lo=m; else hi=m; }
+  body.style.fontSize = lo + "px";
+}
+function refit(){ requestAnimationFrame(fitScreen); }
+window.addEventListener("resize", refit);
+window.addEventListener("orientationchange", ()=>{ refit(); setTimeout(refit, 400); });
+window.addEventListener("load", refit);
+if(document.fonts) document.fonts.ready.then(refit);
+
+function route(){
+  const id = location.hash.slice(1);
+  const d = drinks.find(x=>x.id===id);
+  const app = $("app");
+  if(!d){
+    app.classList.remove("showing"); current = null;
+    renderMenu($("q").value);
+    document.title = "P.S. I Crepe You Drink Recipes";
+    window.scrollTo(0,0);
+    return;
+  }
+  app.classList.add("showing");
+  renderDrink(d);
+  window.scrollTo(0,0);
+}
+
+$("q").addEventListener("input", e => renderMenu(e.target.value));
+document.addEventListener("keydown", e=>{
+  if(e.target.tagName==="INPUT" || !current) return;
+  if(e.key==="ArrowRight") location.hash = $("next").getAttribute("href");
+  if(e.key==="ArrowLeft") location.hash = $("prev").getAttribute("href");
+});
+// Swipe between drinks
+let sx=0, sy=0;
+$("pane").addEventListener("touchstart", e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; }, {passive:true});
+$("pane").addEventListener("touchend", e=>{
+  const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.5 && current){
+    location.hash = (dx<0 ? $("next") : $("prev")).getAttribute("href");
+  }
+}, {passive:true});
+window.addEventListener("hashchange", route);
+renderMenu();
+route();
+</script>
+</body>
+</html>
+
+</body></html>

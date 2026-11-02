@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Food Handler Cards | P.S. I Crepe You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+:root{
+  --bg:#FFE3EC; --panel:#FFFFFF; --ink:#4E1230; --soft:#7E3558; --line:#FFC6D8;
+  --pink:#E8397A; --pink-deep:#B81E5A; --pink-wash:#FFF2F6; --on-pink:#FFFFFF;
+  --red:#B3001B; --red-wash:#FFE5E9; --yellow:#8A5A00; --yellow-edge:#E0A800; --yellow-wash:#FFF1C2;
+  --green:#1E7B45; --green-wash:#DDF3E5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#2A0F1D; --panel:#3A1628; --ink:#FFE6EF; --soft:#E7A3C0; --line:#5C2442;
+    --pink:#FF6FA3; --pink-deep:#FF9CC0; --pink-wash:#44192F; --on-pink:#2A0F1D;
+    --red:#FF8A9A; --red-wash:#4A1520; --yellow:#F7D58C; --yellow-edge:#E0A800; --yellow-wash:#3D2E10;
+    --green:#7FD9A3; --green-wash:#163A26;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#2A0F1D; --panel:#3A1628; --ink:#FFE6EF; --soft:#E7A3C0; --line:#5C2442;
+  --pink:#FF6FA3; --pink-deep:#FF9CC0; --pink-wash:#44192F; --on-pink:#2A0F1D;
+  --red:#FF8A9A; --red-wash:#4A1520; --yellow:#F7D58C; --yellow-edge:#E0A800; --yellow-wash:#3D2E10;
+  --green:#7FD9A3; --green-wash:#163A26;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:19px;line-height:1.45;-webkit-tap-highlight-color:transparent;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3{font-family:"Bricolage Grotesque","Figtree",system-ui,sans-serif;margin:0;line-height:1.08}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:4px solid var(--pink);outline-offset:3px;border-radius:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-80px;background:var(--panel);padding:12px 18px;border-radius:12px;font-weight:800;z-index:20}
+.skip:focus{top:12px}
+
+.wrap{max-width:1200px;margin:0 auto;padding:18px 20px 40px}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:58px;min-width:58px;
+  padding:0 22px;border-radius:999px;background:var(--panel);border:3px solid var(--line);
+  font-weight:800;font-size:18px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--pink);border-color:var(--pink);color:var(--on-pink)}
+.btn.dark{background:#9E1048;border-color:#9E1048;color:#FFFFFF}
+.btn.danger{background:var(--panel);border-color:var(--red);color:var(--red)}
+.btn.danger.armed{background:var(--red);color:#FFFFFF}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.head{margin:18px 0 8px}
+.head h1{font-size:clamp(34px,5vw,48px);font-weight:800;letter-spacing:-0.02em}
+.head p{margin:6px 0 0;font-weight:700;color:var(--soft)}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
+.summary{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px;padding:0;list-style:none}
+.summary li{border-radius:999px;padding:8px 16px;font-weight:800;font-size:17px;border:3px solid}
+.summary .red{background:var(--red-wash);border-color:var(--red);color:var(--red)}
+.summary .yellow{background:var(--yellow-wash);border-color:var(--yellow-edge);color:var(--yellow)}
+.summary .green{background:var(--green-wash);border-color:var(--green);color:var(--green)}
+
+.notice{background:var(--panel);border:3px solid var(--line);border-radius:20px;padding:16px 20px;font-weight:700;margin:14px 0}
+.notice.err{border-color:var(--red)}
+
+.list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr))}
+.row{background:var(--panel);border:3px solid var(--line);border-radius:22px;padding:14px 16px 14px 22px;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;align-items:center;position:relative;overflow:hidden}
+.row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px}
+.row.red{border-color:var(--red)} .row.red::before{background:var(--red)}
+.row.yellow{border-color:var(--yellow-edge)} .row.yellow::before{background:var(--yellow-edge)}
+.row.green{border-color:var(--green)} .row.green::before{background:var(--green)}
+.row h3{font-size:24px;font-weight:800;overflow-wrap:anywhere}
+.type{display:inline-block;margin-top:4px;font-size:14px;font-weight:800;color:var(--pink-deep);background:var(--pink-wash);border-radius:99px;padding:2px 10px}
+.stat{margin:6px 0 0;font-weight:800;font-size:18px}
+.row.red .stat{color:var(--red)} .row.yellow .stat{color:var(--yellow)} .row.green .stat{color:var(--green)}
+.sub{margin:2px 0 0;font-size:15px;font-weight:600;color:var(--soft)}
+.rowbtns{display:flex;flex-direction:column;gap:8px}
+.rowbtns .btn{min-height:52px;font-size:16px;padding:0 18px}
+
+dialog{border:0;border-radius:26px;padding:0;background:var(--panel);color:var(--ink);width:min(720px,94vw);max-height:92vh}
+dialog::backdrop{background:rgba(40,0,20,.6)}
+.dlg{padding:22px 24px 24px;overflow:auto;max-height:92vh}
+.dlg h2{font-size:30px;font-weight:800;margin-bottom:12px}
+.dlgbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.cardimg{display:block;width:100%;height:auto;border-radius:14px;border:2px solid var(--line);background:var(--pink-wash);min-height:120px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:14px 0 0;font-weight:700}
+.facts dt{color:var(--soft)} .facts dd{margin:0}
+
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 16px}
+.field label,.field legend{font-weight:800;font-size:18px}
+.field .hint{font-size:15px;font-weight:600;color:var(--soft);margin:0}
+.field input[type=text],.field input[type=date],.field input[type=password],.field select{
+  min-height:58px;padding:0 16px;border-radius:16px;border:3px solid var(--line);background:var(--bg);font-size:19px;width:100%}
+.field input:focus,.field select:focus{border-color:var(--pink)}
+fieldset.field{border:0;padding:0}
+.choices{display:flex;gap:10px;flex-wrap:wrap}
+.choice{display:flex;align-items:center;gap:10px;min-height:58px;padding:0 18px;border-radius:16px;border:3px solid var(--line);background:var(--bg);font-weight:700;cursor:pointer}
+.choice input{width:24px;height:24px;accent-color:var(--pink)}
+.photo{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.photo img{width:160px;height:auto;border-radius:12px;border:2px solid var(--line)}
+.photo input{position:absolute;opacity:0;width:1px;height:1px}
+.formerr{color:var(--red);font-weight:800;margin:4px 0 12px}
+
+/* Inspector view: plain, high contrast, printable */
+.insp{display:none;background:#FFFFFF;color:#111111;min-height:100vh}
+body.inspecting .wrap{display:none}
+body.inspecting .insp{display:block}
+.insp .inner{max-width:1000px;margin:0 auto;padding:18px 20px 40px}
+.insp h1{font-size:34px;color:#111111}
+.insp .meta{font-weight:700;margin:6px 0 16px;color:#333333}
+.insp table{width:100%;border-collapse:collapse;font-size:18px}
+.insp th,.insp td{border:2px solid #222222;padding:8px 10px;text-align:left;vertical-align:top}
+.insp th{background:#F0F0F0}
+.insp .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:18px;margin-top:22px}
+.insp figure{margin:0;border:2px solid #222222;border-radius:10px;padding:10px;break-inside:avoid}
+.insp figure img{width:100%;height:auto;display:block}
+.insp figcaption{font-weight:800;margin-top:6px}
+.insp .btn{background:#FFFFFF;color:#111111;border-color:#222222}
+@media print{
+  .noprint{display:none!important}
+  body{background:#FFFFFF}
+}
+@media (max-width:560px){
+  .row{grid-template-columns:1fr}
+  .rowbtns{flex-direction:row;flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.btn:active{transform:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#list">Skip to the card list</a>
+
+<div class="wrap" id="main">
+  <div class="bar">
+    <a class="btn primary" href="../prep/" aria-label="Back to the prep recipes home screen">&#8249; Home</a>
+  </div>
+  <header class="head">
+    <h1>Food Handler Cards</h1>
+    <p id="shopLine">Magnolia. Everyone's card in one place, ready for the inspector.</p>
+  </header>
+
+  <ul class="summary" id="summary" aria-label="Card summary"></ul>
+
+  <div class="actions">
+    <button class="btn dark" type="button" id="inspBtn">&#128269; Inspector View</button>
+    <button class="btn primary" type="button" id="addBtn">&#10133; Add a Card</button>
+  </div>
+
+  <div id="live" class="sr" role="status" aria-live="polite"></div>
+  <div id="notice"></div>
+  <ul class="list" id="list" aria-label="Employees and card status" tabindex="-1"></ul>
+</div>
+
+<!-- Inspector view -->
+<section class="insp" id="insp" aria-labelledby="inspTitle">
+  <div class="inner">
+    <div class="bar noprint" style="margin-bottom:14px">
+      <button class="btn" type="button" id="inspClose">&#8249; Back</button>
+      <button class="btn" type="button" id="inspPrint">&#128424; Print</button>
+    </div>
+    <h1 id="inspTitle" tabindex="-1">Food Handler Card Records</h1>
+    <p class="meta" id="inspMeta"></p>
+    <table>
+      <caption class="sr">Every food handler on staff and the status of their card</caption>
+      <thead><tr><th scope="col">Name</th><th scope="col">Certificate</th><th scope="col">Issued</th><th scope="col">Expires</th><th scope="col">Status</th></tr></thead>
+      <tbody id="inspRows"></tbody>
+    </table>
+    <div class="cards" id="inspCards"></div>
+  </div>
+</section>
+
+<!-- View one card -->
+<dialog id="viewDlg" aria-labelledby="viewTitle">
+  <div class="dlg">
+    <h2 id="viewTitle">Card</h2>
+    <img class="cardimg" id="viewImg" alt="">
+    <p id="viewNoPhoto" class="notice" hidden>No photo on file yet. Tap Edit to add one.</p>
+    <dl class="facts" id="viewFacts"></dl>
+    <div class="dlgbar">
+      <button class="btn primary" type="button" id="viewClose">Close</button>
+      <button class="btn" type="button" id="viewEdit">&#9998; Edit or Renew</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Add or edit -->
+<dialog id="formDlg" aria-labelledby="formTitle">
+  <form class="dlg" id="form" novalidate>
+    <h2 id="formTitle">Add a Card</h2>
+    <p class="formerr" id="formErr" role="alert" hidden></p>
+
+    <div class="field">
+      <label for="fName">Employee name</label>
+      <input type="text" id="fName" autocomplete="off" required maxlength="80">
+    </div>
+
+    <fieldset class="field">
+      <legend>Which certificate?</legend>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="fType" value="handler" checked> Food Handler Card (3 years)</label>
+        <label class="choice"><input type="radio" name="fType" value="manager"> Food Manager Certificate (5 years)</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="field">
+      <legend>Do they have their card yet?</legend>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="fHas" value="yes" checked> Yes, they have it</label>
+        <label class="choice"><input type="radio" name="fHas" value="no"> Not yet, new hire</label>
+      </div>
+    </fieldset>
+
+    <div class="field" id="hireWrap">
+      <label for="fHire">Hire date</label>
+      <p class="hint" id="hireHint">They have 30 days from this date to get their card.</p>
+      <input type="date" id="fHire" aria-describedby="hireHint">
+    </div>
+
+    <div id="cardFields">
+      <div class="field">
+        <label for="fIssue">Date the card was issued</label>
+        <input type="date" id="fIssue">
+      </div>
+      <div class="field">
+        <label for="fExp">Expiration date</label>
+        <p class="hint" id="expHint">Fills in for you from the issue date. Change it if the card shows something different.</p>
+        <input type="date" id="fExp" aria-describedby="expHint">
+      </div>
+      <div class="field">
+        <label for="fCert">Certificate number (optional)</label>
+        <input type="text" id="fCert" autocomplete="off" maxlength="40">
+      </div>
+      <div class="field">
+        <span id="photoLabel" style="font-weight:800;font-size:18px">Photo of the card</span>
+        <div class="photo">
+          <label class="btn" for="fPhoto" id="photoBtn">&#128247; Take Photo</label>
+          <input type="file" id="fPhoto" accept="image/*" capture="environment" aria-labelledby="photoLabel photoBtn">
+          <img id="fPreview" alt="Preview of the card photo" hidden>
+          <span id="photoNote" class="hint"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="fPin">Manager PIN</label>
+      <input type="password" id="fPin" inputmode="numeric" autocomplete="off" maxlength="12">
+    </div>
+
+    <div class="dlgbar">
+      <button class="btn primary" type="submit" id="saveBtn">Save</button>
+      <button class="btn" type="button" id="cancelBtn">Cancel</button>
+      <button class="btn danger" type="button" id="removeBtn" hidden>Remove</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const API = (window.CARDS_API || "").trim();
+const DEMO = /[?&]demo=1/.test(location.search);
+const SHOP = window.CARDS_SHOP || "Magnolia";
+const SOON = 60, NEWHIRE = 30, YEARS = {handler:3, manager:5};
+
+let cards = [], today = localYmd(), editing = null, pinMemo = null, imgCache = {};
+
+/* ---------- dates ---------- */
+function localYmd(){ const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function utc(ymd){ const p = ymd.split("-").map(Number); return Date.UTC(p[0],p[1]-1,p[2]); }
+function days(a,b){ return Math.round((utc(b)-utc(a))/86400000); }
+function addDays(ymd,n){ return new Date(utc(ymd)+n*86400000).toISOString().slice(0,10); }
+function addYears(ymd,n){ const p = ymd.split("-").map(Number); const d = new Date(Date.UTC(p[0]+n,p[1]-1,p[2])); if(d.getUTCMonth()!==p[1]-1) d.setUTCDate(0); return d.toISOString().slice(0,10); }
+function pretty(ymd){ return ymd ? new Date(utc(ymd)).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"}) : ""; }
+function plural(n,w){ return n+" "+w+(n===1?"":"s"); }
+
+function status(c){
+  if(c.issueDate && c.expires){
+    const d = days(today,c.expires);
+    if(d<0) return {level:"red", icon:"✖", text:"Expired "+plural(-d,"day")+" ago", short:"Expired"};
+    if(d===0) return {level:"red", icon:"✖", text:"Expires today", short:"Expires today"};
+    if(d<=SOON) return {level:"yellow", icon:"⚠", text:"Expires in "+plural(d,"day"), short:"Expiring soon"};
+    return {level:"green", icon:"✔", text:"Valid until "+pretty(c.expires), short:"Valid"};
+  }
+  const due = addDays(c.hireDate,NEWHIRE), d = days(today,due);
+  if(d<0) return {level:"red", icon:"✖", text:"No card. 30 day window ended "+plural(-d,"day")+" ago", short:"Missing"};
+  return {level:"yellow", icon:"⏳", text:"New hire: "+plural(d,"day")+" left to get a card (due "+pretty(due)+")", short:"New hire, due "+pretty(due)};
+}
+const order = {red:0,yellow:1,green:2};
+const typeName = t => t==="manager" ? "Food Manager Certificate" : "Food Handler Card";
+
+/* ---------- backend ---------- */
+const demoStore = {
+  list:[
+    {id:"d1",name:"Maria Lopez",type:"handler",hireDate:"",issueDate:"2024-03-12",expires:"2027-03-12",certNumber:"",hasPhoto:false},
+    {id:"d2",name:"Jordan Smith",type:"handler",hireDate:"",issueDate:"2023-12-01",expires:addDays(localYmd(),25),certNumber:"",hasPhoto:false},
+    {id:"d3",name:"Ana Ruiz",type:"handler",hireDate:addDays(localYmd(),-18),issueDate:"",expires:"",certNumber:"",hasPhoto:false},
+    {id:"d4",name:"Chris Lee",type:"manager",hireDate:"",issueDate:"2021-10-01",expires:addDays(localYmd(),-4),certNumber:"",hasPhoto:false}
+  ], photos:{}
+};
+async function apiList(){
+  if(DEMO){ return {ok:true, shop:SHOP, today:localYmd(), cards:JSON.parse(JSON.stringify(demoStore.list))}; }
+  const r = await fetch(API+"?action=list&t="+Date.now(),{cache:"no-store"});
+  return r.json();
+}
+async function apiImage(id){
+  if(imgCache[id]) return imgCache[id];
+  let res;
+  if(DEMO){ res = demoStore.photos[id] ? {ok:true,dataUrl:demoStore.photos[id]} : {ok:false}; }
+  else { const r = await fetch(API+"?action=image&id="+encodeURIComponent(id)+"&t="+Date.now(),{cache:"no-store"}); res = await r.json(); }
+  if(res.ok) imgCache[id] = res.dataUrl;
+  return res.ok ? res.dataUrl : null;
+}
+async function apiPost(body){
+  if(DEMO){
+    if(body.pin!=="2468") return {ok:false,pinError:true,error:"Wrong PIN"};
+    if(body.action==="remove"){ demoStore.list = demoStore.list.filter(c=>c.id!==body.id); return {ok:true}; }
+    if(body.action==="save"){
+      const exp = body.expires || (body.issueDate ? addYears(body.issueDate,YEARS[body.type]) : "");
+      const rec = {id:body.id||("d"+Date.now()),name:body.name,type:body.type,hireDate:body.hireDate,issueDate:body.issueDate,expires:exp,certNumber:body.certNumber,hasPhoto:false};
+      const old = demoStore.list.find(c=>c.id===rec.id);
+      if(body.photo) demoStore.photos[rec.id] = body.photo;
+      rec.hasPhoto = !!demoStore.photos[rec.id];
+      if(old) Object.assign(old,rec); else demoStore.list.push(rec);
+      return {ok:true,id:rec.id};
+    }
+    return {ok:true};
+  }
+  const r = await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});
+  return r.json();
+}
+
+/* ---------- render ---------- */
+function announce(msg){ $("live").textContent = ""; setTimeout(()=>{ $("live").textContent = msg; },50); }
+
+function render(){
+  $("shopLine").textContent = SHOP+". Everyone's card in one place, ready for the inspector."+(DEMO?" (Demo data)":"");
+  const sorted = cards.map(c=>({c,s:status(c)})).sort((a,b)=>order[a.s.level]-order[b.s.level] || a.c.name.localeCompare(b.c.name));
+  const n = {red:0,yellow:0,green:0}; sorted.forEach(x=>n[x.s.level]++);
+  $("summary").innerHTML = "";
+  [["green",n.green+" valid"],["yellow",n.yellow+" expiring soon or new hire"],["red",n.red+" expired or missing"]].forEach(([k,t])=>{
+    const li = document.createElement("li"); li.className = k; li.textContent = t; $("summary").appendChild(li);
+  });
+
+  const list = $("list"); list.innerHTML = "";
+  if(!sorted.length){
+    const li = document.createElement("li"); li.className = "notice";
+    li.textContent = "No cards yet. Tap Add a Card to put the first one in.";
+    list.appendChild(li); return;
+  }
+  sorted.forEach(({c,s})=>{
+    const li = document.createElement("li"); li.className = "row "+s.level;
+    const info = document.createElement("div");
+    const h = document.createElement("h3"); h.textContent = c.name; info.appendChild(h);
+    const t = document.createElement("span"); t.className = "type"; t.textContent = typeName(c.type); info.appendChild(t);
+    const st = document.createElement("p"); st.className = "stat";
+    st.innerHTML = '<span aria-hidden="true"></span> '; st.firstChild.textContent = s.icon; st.append(s.text); info.appendChild(st);
+    if(c.issueDate){ const sub = document.createElement("p"); sub.className = "sub"; sub.textContent = "Issued "+pretty(c.issueDate)+(c.hasPhoto?"":". No photo on file"); info.appendChild(sub); }
+    li.appendChild(info);
+
+    const btns = document.createElement("div"); btns.className = "rowbtns";
+    const v = document.createElement("button"); v.type = "button"; v.className = "btn primary"; v.textContent = "View Card";
+    v.setAttribute("aria-label","View card for "+c.name); v.onclick = () => openView(c);
+    const e = document.createElement("button"); e.type = "button"; e.className = "btn"; e.textContent = "Edit";
+    e.setAttribute("aria-label","Edit or renew card for "+c.name); e.onclick = () => openForm(c);
+    btns.append(v,e); li.appendChild(btns);
+    list.appendChild(li);
+  });
+}
+
+function showNotice(msg,err){
+  $("notice").innerHTML = msg ? '<div class="notice'+(err?" err":"")+'" role="'+(err?"alert":"status")+'"></div>' : "";
+  if(msg) $("notice").firstChild.textContent = msg;
+}
+
+async function load(quiet){
+  if(!API && !DEMO){ showNotice("This page is not connected yet. Paste the web app link into cards/config.js to finish setup.",true); cards = []; render(); return; }
+  try{
+    const res = await apiList();
+    if(!res.ok) throw new Error(res.error||"Could not load");
+    cards = res.cards || []; if(res.today) today = res.today;
+    showNotice(""); render();
+    if(!quiet) announce(cards.length+" cards loaded");
+  }catch(err){
+    showNotice("Could not load the cards. Check the wifi and pull to refresh. ("+err.message+")",true);
+  }
+}
+
+/* ---------- view one ---------- */
+let viewing = null;
+async function openView(c){
+  viewing = c;
+  $("viewTitle").textContent = c.name;
+  const img = $("viewImg"); img.removeAttribute("src"); img.alt = "Loading card photo for "+c.name; img.hidden = !c.hasPhoto;
+  $("viewNoPhoto").hidden = c.hasPhoto;
+  const s = status(c), f = $("viewFacts"); f.innerHTML = "";
+  [["Certificate",typeName(c.type)],["Status",s.text],["Issued",pretty(c.issueDate)||"Not yet"],["Expires",pretty(c.expires)||"Not yet"],["Hire date",pretty(c.hireDate)],["Certificate #",c.certNumber]]
+    .filter(r=>r[1]).forEach(([k,v])=>{ const dt=document.createElement("dt"),dd=document.createElement("dd"); dt.textContent=k; dd.textContent=v; f.append(dt,dd); });
+  $("viewDlg").showModal(); $("viewClose").focus();
+  if(c.hasPhoto){
+    try{ const url = await apiImage(c.id); if(viewing===c){ if(url){ img.src = url; img.alt = typeName(c.type)+" for "+c.name; } else { img.hidden = true; $("viewNoPhoto").hidden = false; } } }
+    catch(e){ img.alt = "Could not load the photo"; }
+  }
+}
+$("viewClose").onclick = () => $("viewDlg").close();
+$("viewEdit").onclick = () => { $("viewDlg").close(); openForm(viewing); };
+
+/* ---------- add / edit ---------- */
+let photoData = null;
+function setHas(v){
+  document.querySelector('input[name=fHas][value='+v+']').checked = true;
+  $("cardFields").hidden = v!=="yes";
+  $("hireHint").textContent = v==="yes" ? "Optional. Leave blank if you don't know it." : "They have 30 days from this date to get their card.";
+}
+document.querySelectorAll("input[name=fHas]").forEach(r=>r.onchange = () => setHas(r.value));
+function curType(){ return document.querySelector("input[name=fType]:checked").value; }
+function autoExp(){ if($("fIssue").value) $("fExp").value = addYears($("fIssue").value,YEARS[curType()]); }
+$("fIssue").onchange = autoExp;
+document.querySelectorAll("input[name=fType]").forEach(r=>r.onchange = autoExp);
+
+function formError(msg){ const e = $("formErr"); e.hidden = !msg; e.textContent = msg||""; }
+
+function openForm(c){
+  editing = c || null; photoData = null; formError("");
+  $("formTitle").textContent = c ? "Edit "+c.name : "Add a Card";
+  $("fName").value = c ? c.name : "";
+  document.querySelector('input[name=fType][value='+(c?c.type:"handler")+']').checked = true;
+  setHas(c && !c.issueDate ? "no" : "yes");
+  $("fHire").value = c ? c.hireDate : "";
+  $("fIssue").value = c ? c.issueDate : "";
+  $("fExp").value = c ? c.expires : "";
+  $("fCert").value = c ? c.certNumber : "";
+  $("fPhoto").value = ""; $("fPreview").hidden = true;
+  $("photoNote").textContent = c && c.hasPhoto ? "A photo is on file. Take a new one to replace it." : "";
+  $("photoBtn").innerHTML = c && c.hasPhoto ? "&#128247; Replace Photo" : "&#128247; Take Photo";
+  $("fPin").value = pinMemo && Date.now()-pinMemo.t < 10*60000 ? pinMemo.pin : "";
+  $("removeBtn").hidden = !c; $("removeBtn").classList.remove("armed"); $("removeBtn").textContent = "Remove";
+  $("formDlg").showModal(); $("fName").focus();
+}
+$("addBtn").onclick = () => openForm(null);
+$("cancelBtn").onclick = () => $("formDlg").close();
+
+$("fPhoto").onchange = async () => {
+  const file = $("fPhoto").files[0]; if(!file) return;
+  $("photoNote").textContent = "Getting the photo ready...";
+  try{
+    photoData = await shrink(file, 1600, 0.82);
+    $("fPreview").src = photoData; $("fPreview").hidden = false;
+    $("photoNote").textContent = "Photo ready.";
+  }catch(e){ photoData = null; $("photoNote").textContent = "That photo could not be read. Try again."; }
+};
+function shrink(file,max,q){
+  return new Promise((resolve,reject)=>{
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max/Math.max(img.width,img.height));
+      const cv = document.createElement("canvas"); cv.width = Math.round(img.width*k); cv.height = Math.round(img.height*k);
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height); URL.revokeObjectURL(url);
+      resolve(cv.toDataURL("image/jpeg",q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("bad image")); };
+    img.src = url;
+  });
+}
+
+$("form").onsubmit = async ev => {
+  ev.preventDefault();
+  const has = document.querySelector("input[name=fHas]:checked").value === "yes";
+  const body = {
+    action:"save", id: editing ? editing.id : "", pin:$("fPin").value.trim(),
+    name:$("fName").value.trim(), type:curType(), hireDate:$("fHire").value,
+    issueDate: has ? $("fIssue").value : "", expires: has ? $("fExp").value : "",
+    certNumber: has ? $("fCert").value.trim() : "", photo: has ? photoData : null
+  };
+  if(!body.name){ formError("Enter the employee's name."); $("fName").focus(); return; }
+  if(has && !body.issueDate){ formError("Enter the date the card was issued."); $("fIssue").focus(); return; }
+  if(!has && !body.hireDate){ formError("Enter the hire date so the 30 day countdown can start."); $("fHire").focus(); return; }
+  if(!body.pin){ formError("Enter the manager PIN to save."); $("fPin").focus(); return; }
+  formError(""); const btn = $("saveBtn"); btn.disabled = true; btn.textContent = "Saving...";
+  try{
+    const res = await apiPost(body);
+    if(!res.ok){ formError(res.pinError ? "That PIN is not right." : (res.error||"Could not save.")); if(res.pinError){ pinMemo = null; $("fPin").focus(); } return; }
+    pinMemo = {pin:body.pin,t:Date.now()};
+    if(editing) delete imgCache[editing.id];
+    $("formDlg").close(); announce("Saved card for "+body.name); await load(true);
+  }catch(e){ formError("Could not reach the server. Check the wifi and try again."); }
+  finally{ btn.disabled = false; btn.textContent = "Save"; }
+};
+
+$("removeBtn").onclick = async () => {
+  const b = $("removeBtn");
+  if(!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "Tap again to remove "+editing.name; return; }
+  const pin = $("fPin").value.trim();
+  if(!pin){ formError("Enter the manager PIN to remove a card."); $("fPin").focus(); return; }
+  b.disabled = true;
+  try{
+    const res = await apiPost({action:"remove",id:editing.id,pin});
+    if(!res.ok){ formError(res.pinError ? "That PIN is not right." : (res.error||"Could not remove.")); return; }
+    pinMemo = {pin,t:Date.now()};
+    const nm = editing.name; $("formDlg").close(); announce("Removed "+nm); await load(true);
+  }catch(e){ formError("Could not reach the server. Check the wifi and try again."); }
+  finally{ b.disabled = false; }
+};
+
+/* ---------- inspector view ---------- */
+async function openInspector(){
+  document.body.classList.add("inspecting");
+  const now = new Date().toLocaleString("en-US",{month:"long",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
+  $("inspTitle").textContent = "P.S. I Crepe You, "+SHOP+": Food Handler Card Records";
+  $("inspMeta").textContent = "Shown "+now+". "+plural(cards.length,"employee")+" on file.";
+  const sorted = [...cards].sort((a,b)=>a.name.localeCompare(b.name));
+  const tb = $("inspRows"); tb.innerHTML = "";
+  sorted.forEach(c=>{
+    const s = status(c), tr = document.createElement("tr");
+    [c.name,typeName(c.type),pretty(c.issueDate)||"Not yet",pretty(c.expires)||"Not yet",s.short].forEach((v,i)=>{
+      const td = document.createElement(i===0?"th":"td"); if(i===0) td.scope = "row"; td.textContent = v; tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  const box = $("inspCards"); box.innerHTML = "";
+  $("inspTitle").focus(); window.scrollTo(0,0);
+  for(const c of sorted.filter(c=>c.hasPhoto)){
+    const fig = document.createElement("figure"), img = document.createElement("img"), cap = document.createElement("figcaption");
+    img.alt = "Loading "+typeName(c.type)+" for "+c.name; cap.textContent = c.name+", "+typeName(c.type);
+    fig.append(img,cap); box.appendChild(fig);
+    apiImage(c.id).then(u=>{ if(u){ img.src = u; img.alt = typeName(c.type)+" for "+c.name; } else img.alt = "Photo could not load"; }).catch(()=>{ img.alt = "Photo could not load"; });
+  }
+}
+$("inspBtn").onclick = openInspector;
+$("inspClose").onclick = () => { document.body.classList.remove("inspecting"); $("inspBtn").focus(); };
+$("inspPrint").onclick = () => window.print();
+
+/* ---------- start ---------- */
+load();
+setInterval(()=>{ if(!document.hidden && !$("formDlg").open) load(true); }, 5*60000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load(true); });
+})();
+</script>
+</body>
+</html>

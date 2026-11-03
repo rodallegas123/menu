@@ -104,6 +104,12 @@ fieldset.field{border:0;padding:0}
 .photo img{width:160px;height:auto;border-radius:12px;border:2px solid var(--line)}
 .photo input{position:absolute;opacity:0;width:1px;height:1px}
 .formerr{color:var(--red);font-weight:800;margin:4px 0 12px}
+.scan{background:var(--pink-wash);border:2px solid var(--line);border-radius:20px;padding:16px 18px;margin:0 0 18px}
+.scan .btn{width:100%}
+.scan p{margin:10px 0 0;font-weight:700;font-size:16px;color:var(--soft)}
+.scan p.busy{color:var(--pink-deep)}
+.read{border-color:var(--yellow-edge)!important;background:var(--yellow-wash)!important}
+.readtag{display:inline-block;margin-left:8px;font-size:13px;font-weight:800;color:var(--yellow);background:var(--yellow-wash);border:1px solid var(--yellow-edge);border-radius:99px;padding:1px 9px;vertical-align:middle}
 
 /* Inspector view: plain, high contrast, printable */
 .insp{display:none;background:#FFFFFF;color:#111111;min-height:100vh}
@@ -192,6 +198,11 @@ body.inspecting .insp{display:block}
   <form class="dlg" id="form" novalidate>
     <h2 id="formTitle">Add a Card</h2>
     <p class="formerr" id="formErr" role="alert" hidden></p>
+
+    <div class="scan" id="scanBox">
+      <button class="btn primary" type="button" id="scanBtn">&#128247; Snap Card and Fill In</button>
+      <p id="scanNote" role="status" aria-live="polite">Take a clear photo of the card and the name, certificate number and dates fill in for you. Check them before you save.</p>
+    </div>
 
     <div class="field">
       <label for="fName">Employee name</label>
@@ -413,6 +424,7 @@ let photoData = null;
 function setHas(v){
   document.querySelector('input[name=fHas][value='+v+']').checked = true;
   $("cardFields").hidden = v!=="yes";
+  $("scanBox").hidden = v!=="yes";
   $("hireHint").textContent = v==="yes" ? "Optional. Leave blank if you don't know it." : "They have 30 days from this date to get their card.";
 }
 document.querySelectorAll("input[name=fHas]").forEach(r=>r.onchange = () => setHas(r.value));
@@ -434,6 +446,8 @@ function openForm(c){
   $("fExp").value = c ? c.expires : "";
   $("fCert").value = c ? c.certNumber : "";
   $("fPhoto").value = ""; $("fPreview").hidden = true;
+  clearRead(); $("scanNote").classList.remove("busy");
+  $("scanNote").textContent = "Take a clear photo of the card and the name, certificate number and dates fill in for you. Check them before you save.";
   $("photoNote").textContent = c && c.hasPhoto ? "A photo is on file. Take a new one to replace it." : "";
   $("photoBtn").innerHTML = c && c.hasPhoto ? "&#128247; Replace Photo" : "&#128247; Take Photo";
   $("fPin").value = pinMemo && Date.now()-pinMemo.t < 10*60000 ? pinMemo.pin : "";
@@ -450,8 +464,167 @@ $("fPhoto").onchange = async () => {
     photoData = await shrink(file, 1600, 0.82);
     $("fPreview").src = photoData; $("fPreview").hidden = false;
     $("photoNote").textContent = "Photo ready.";
-  }catch(e){ photoData = null; $("photoNote").textContent = "That photo could not be read. Try again."; }
+  }catch(e){ photoData = null; $("photoNote").textContent = "That photo could not be read. Try again."; return; }
+  readCard(photoData);
 };
+$("scanBtn").onclick = () => $("fPhoto").click();
+
+/* ---------- read the card photo ---------- */
+let ocrLib = null;
+function loadOcr(){
+  if(ocrLib) return ocrLib;
+  ocrLib = new Promise((res,rej)=>{
+    const sc = document.createElement("script");
+    sc.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    sc.onload = () => res(window.Tesseract); sc.onerror = () => { ocrLib = null; rej(new Error("load")); };
+    document.head.appendChild(sc);
+  });
+  return ocrLib;
+}
+function scanSay(msg,busy){ const n=$("scanNote"); n.textContent = msg; n.classList.toggle("busy",!!busy); }
+function clearRead(){
+  document.querySelectorAll("#form .read").forEach(e=>e.classList.remove("read"));
+  document.querySelectorAll("#form .readtag").forEach(e=>e.remove());
+}
+function markRead(id){
+  const el = $(id); el.classList.add("read");
+  const lab = document.querySelector('label[for="'+id+'"]');
+  if(lab && !lab.querySelector(".readtag")){ const t=document.createElement("span"); t.className="readtag"; t.textContent="Read from photo, please check"; lab.appendChild(t); }
+}
+function rotateData(dataUrl){
+  return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const cv=document.createElement("canvas"); cv.width=img.height; cv.height=img.width;
+    const g=cv.getContext("2d"); g.translate(cv.width,0); g.rotate(Math.PI/2); g.drawImage(img,0,0); res(cv.toDataURL("image/jpeg",.9)); }; img.src=dataUrl; });
+}
+let reading = 0;
+async function readCard(dataUrl){
+  const run = ++reading;
+  scanSay("Reading the card. The first time can take up to 20 seconds...",true);
+  $("scanBtn").disabled = true;
+  try{
+    const T = await loadOcr();
+    let text = (await T.recognize(dataUrl,"eng")).data.text || "";
+    let info = parseCard(text);
+    if(!info.dates.length){ // maybe the photo is sideways
+      for(let i=0;i<3 && !info.dates.length;i++){ dataUrl = await rotateData(dataUrl); text = (await T.recognize(dataUrl,"eng")).data.text || ""; info = parseCard(text); }
+    }
+    if(run!==reading) return;
+    applyCard(info);
+  }catch(e){
+    if(run===reading) scanSay("Could not read the card right now. Check the wifi, or type the details in below.",false);
+  }finally{ if(run===reading) $("scanBtn").disabled = false; }
+}
+function applyCard(info){
+  clearRead();
+  const got = [];
+  if(info.manager){ document.querySelector('input[name=fType][value=manager]').checked = true; got.push("certificate type"); }
+  else if(info.handler){ document.querySelector('input[name=fType][value=handler]').checked = true; }
+  setHas("yes");
+  if(info.name && !$("fName").value.trim()){ $("fName").value = info.name; markRead("fName"); got.push("name"); }
+  if(info.cert){ $("fCert").value = info.cert; markRead("fCert"); got.push("certificate number"); }
+  const yrs = YEARS[curType()];
+  let issue = info.issue, exp = info.expires;
+  if(!issue && exp) issue = addYears(exp,-yrs);
+  if(issue){ $("fIssue").value = issue; markRead("fIssue"); got.push("issue date"); }
+  if(exp){ $("fExp").value = exp; markRead("fExp"); got.push("expiration date"); }
+  else if(issue){ $("fExp").value = addYears(issue,yrs); }
+  if(!got.length){ scanSay("Could not find the details on that photo. Try again with the card flat, in good light, filling the frame. Or type them in below.",false); return; }
+  const missed = ["name","certificate number","expiration date"].filter(k=>!got.includes(k) && !(k==="name" && $("fName").value.trim()));
+  const list = got.length>1 ? got.slice(0,-1).join(", ")+" and "+got[got.length-1] : got[0];
+  scanSay("Filled in the "+list+". The highlighted boxes came from the photo, so check them before saving."+(missed.length?" Could not find the "+missed.join(" or ")+", please type it in.":""),false);
+}
+
+/* pulls name, cert number and dates out of the text on the card */
+const MONTHS = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12};
+function ymd(y,m,d){
+  y=+y; m=+m; d=+d; if(y<100) y+=2000;
+  if(m<1||m>12||d<1||d>31||y<1990||y>2060) return "";
+  return y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+}
+function findDates(line){
+  const out = []; let m;
+  const num = /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4}|\d{2})\b/g;
+  while((m=num.exec(line))) { const v=ymd(m[3],m[1],m[2]); if(v) out.push({v,at:m.index}); }
+  const iso = /\b(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\b/g;
+  while((m=iso.exec(line))) { const v=ymd(m[1],m[2],m[3]); if(v) out.push({v,at:m.index}); }
+  const word = /\b(jan|feb|mar|apr|may|jun|jul|aug|sept?|oct|nov|dec)[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})\b/gi;
+  while((m=word.exec(line))) { const v=ymd(m[3],MONTHS[m[1].toLowerCase()],m[2]); if(v) out.push({v,at:m.index}); }
+  const word2 = /\b(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sept?|oct|nov|dec)[a-z]*\.?,?\s+(\d{4})\b/gi;
+  while((m=word2.exec(line))) { const v=ymd(m[3],MONTHS[m[2].toLowerCase()],m[1]); if(v) out.push({v,at:m.index}); }
+  return out.sort((a,b)=>a.at-b.at).map(x=>x.v);
+}
+const NOT_NAME = /(food|handler|card|certif|manager|protection|servsafe|serv\s*safe|california|county|state|national|restaurant|association|exam|expir|issue|date|valid|number|training|course|safety|ansi|anab|accredit|program|program|learn2serve|premier|statefood|always|food\s*handler|employee|signature|this|that|has|completed|successfully|requirement|code|health|department|www|\.com|inc\b|llc|score|id\b|no\.)/i;
+function cleanName(t){
+  t = t.replace(/[^A-Za-z\s'.]/g," ").replace(/\s+/g," ").trim();
+  const w = t.split(" ").filter(x=>x.length>0);
+  if(w.length<2||w.length>4) return "";
+  if(w.some(x=>x.replace(/[.']/g,"").length<1)) return "";
+  if(NOT_NAME.test(t)) return "";
+  return w.map(x=> x.length<=2 && x.endsWith(".") ? x.toUpperCase() : x.charAt(0).toUpperCase()+x.slice(1).toLowerCase()).join(" ");
+}
+function parseCard(text){
+  const lines = text.split(/\n+/).map(l=>l.replace(/[|_~`]/g," ").replace(/\s+/g," ").trim()).filter(Boolean);
+  const all = lines.join("\n");
+  const info = {name:"",cert:"",issue:"",expires:"",dates:[],manager:false,handler:false};
+  info.manager = /(manager|protection\s*manager|food\s*protection)/i.test(all);
+  info.handler = /handler/i.test(all);
+
+  // dates with their labels
+  lines.forEach((l,i)=>{
+    const ds = findDates(l); if(!ds.length) return;
+    ds.forEach(d=>info.dates.push(d));
+    const ctx = l + " " + (lines[i-1]||"");
+    if(/exp|valid\s*(thru|through|until)|good\s*(thru|through)/i.test(l)) info.expires = info.expires || ds[ds.length-1];
+    else if(/issue|date\s*of|certif|complet|exam|earned|test|awarded/i.test(l)) info.issue = info.issue || ds[0];
+    else if(/exp/i.test(lines[i-1]||"") && !info.expires) info.expires = ds[0];
+    else if(/issue|complet|exam/i.test(lines[i-1]||"") && !info.issue) info.issue = ds[0];
+  });
+  const uniq = [...new Set(info.dates)].sort();
+  if(!info.expires && !info.issue && uniq.length>=2){ info.issue = uniq[0]; info.expires = uniq[uniq.length-1]; }
+  else if(!info.expires && uniq.length){ const later = uniq.filter(d=>!info.issue||d>info.issue); if(later.length) info.expires = later[later.length-1]; else if(!info.issue) info.expires = uniq[0]; }
+  else if(!info.issue && uniq.length>=2){ const earlier = uniq.filter(d=>d<info.expires); if(earlier.length) info.issue = earlier[0]; }
+  if(info.issue && info.expires && info.issue>=info.expires) info.issue = "";
+
+  // certificate number
+  const isDate = t => findDates(t).length>0;
+  for(let i=0;i<lines.length && !info.cert;i++){
+    const l = lines[i];
+    if(!/(cert|card|id|no\b|no\.|number|#|license|registration)/i.test(l)) continue;
+    const tail = l.replace(/^.*?(cert(ificate)?|card|id|license|registration)?\s*(number|no\.?|#|num)\s*[:#.]?\s*/i,"");
+    const pool = [tail, l, lines[i+1]||""];
+    for(const p of pool){
+      const tok = (p.match(/[A-Z0-9][A-Z0-9\-]{4,24}/gi)||[]).find(t=>/\d{4,}/.test(t.replace(/-/g,"")) && !isDate(t));
+      if(tok){ info.cert = tok.toUpperCase(); break; }
+    }
+  }
+  if(!info.cert){
+    const toks = (all.match(/\b[A-Z0-9][A-Z0-9\-]{5,24}\b/gi)||[]).filter(t=>/\d{5,}/.test(t.replace(/-/g,"")) && !isDate(t) && !/^\d{5}$/.test(t));
+    toks.sort((a,b)=>b.length-a.length); if(toks.length) info.cert = toks[0].toUpperCase();
+  }
+
+  // name: after a lead in phrase, or a short line that looks like a person's name
+  const lead = /(certif(y|ies)\s+that|awarded\s+to|presented\s+to|issued\s+to|this\s+is\s+to\s+certify|name\s*[:\-]|card\s*holder|holder\s*[:\-]|student\s*[:\-])/i;
+  for(let i=0;i<lines.length && !info.name;i++){
+    const l = lines[i];
+    if(lead.test(l)){
+      const after = l.split(lead).pop().replace(/^[^A-Za-z]+/,"");
+      info.name = cleanName(after) || cleanName(lines[i+1]||"") || cleanName(lines[i+2]||"");
+    }
+  }
+  if(!info.name){
+    let best="", score=-1;
+    lines.forEach(l=>{
+      const n = cleanName(l); if(!n) return;
+      const raw = l.replace(/[^A-Za-z\s]/g,"").trim();
+      let sc = 1;
+      if(raw===raw.toUpperCase()) sc += 1;
+      if(/^[A-Z][a-z]+(\s[A-Z][a-z.]+){1,3}$/.test(raw)) sc += 1;
+      if(l.replace(/[A-Za-z\s'.]/g,"").length>2) sc -= 1;
+      if(sc>score){ score=sc; best=n; }
+    });
+    info.name = best;
+  }
+  return info;
+}
 function shrink(file,max,q){
   return new Promise((resolve,reject)=>{
     const url = URL.createObjectURL(file), img = new Image();

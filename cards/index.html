@@ -105,6 +105,8 @@ fieldset.field{border:0;padding:0}
 .photo img{width:160px;height:auto;border-radius:12px;border:2px solid var(--line)}
 .photo input{position:absolute;opacity:0;width:1px;height:1px}
 .formerr{color:var(--red);font-weight:800;margin:4px 0 12px}
+/* video mode: blur every card photo so real names on the cards never show */
+html.video img.cardimg, html.video #inspCards img, html.video #fPreview, html.video .photo img{filter:blur(22px) saturate(.9);clip-path:inset(0 round 14px)}
 .scan{background:var(--pink-wash);border:2px solid var(--line);border-radius:20px;padding:16px 18px;margin:0 0 18px}
 .scan .btn{width:100%}
 .scan p{margin:10px 0 0;font-weight:700;font-size:16px;color:var(--soft)}
@@ -275,6 +277,9 @@ body.inspecting .insp{display:block}
 const $ = id => document.getElementById(id);
 const API = (window.CARDS_API || "").trim();
 const DEMO = /[?&]demo=1/.test(location.search);
+const VIDEO = /[?&]video=1/.test(location.search);  /* video mode: fake names, blurred photos, nothing saves */
+if(VIDEO) document.documentElement.classList.add("video");
+const FAKE_NAMES = ["Alex Rivera","Sam Carter","Jamie Brooks","Taylor Reed","Jordan Hayes","Casey Morgan","Riley Parker","Avery Collins","Drew Bennett","Morgan Ellis","Quinn Foster","Reese Walker","Skyler Grant","Cameron Price","Hayden Cole","Peyton Lane","Rowan Blake","Emerson Shaw","Logan Pierce","Dakota Hill"];
 const SHOP = window.CARDS_SHOP || "Magnolia";
 const SOON = 60, NEWHIRE = 30, YEARS = {handler:3, manager:5};
 
@@ -394,6 +399,10 @@ async function load(quiet){
     const res = await apiList();
     if(!res.ok) throw new Error(res.error||"Could not load");
     cards = res.cards || []; if(res.today) today = res.today;
+    if(VIDEO){
+      const ids = cards.map(c=>c.id).sort();
+      cards.forEach(c=>{ const i = ids.indexOf(c.id); c.name = FAKE_NAMES[i % FAKE_NAMES.length] + (i>=FAKE_NAMES.length ? " "+(Math.floor(i/FAKE_NAMES.length)+1) : ""); if(c.certNumber) c.certNumber = "FH" + String(100000 + i*7391).slice(-6); });
+    }
     showNotice(""); render();
     if(!quiet) announce(cards.length+" cards loaded");
   }catch(err){
@@ -516,6 +525,7 @@ async function readCard(dataUrl){
 }
 function applyCard(info){
   clearRead();
+  if(VIDEO){ if(info.name) info.name = "Jamie Brooks"; if(info.cert) info.cert = "FH204816"; }
   const got = [];
   if(info.manager){ document.querySelector('input[name=fType][value=manager]').checked = true; got.push("certificate type"); }
   else if(info.handler){ document.querySelector('input[name=fType][value=handler]').checked = true; }
@@ -642,6 +652,7 @@ function shrink(file,max,q){
 
 $("form").onsubmit = async ev => {
   ev.preventDefault();
+  if(VIDEO){ formError("Video mode is on, so nothing is saved. Use the normal link to make real changes."); return; }
   const has = document.querySelector("input[name=fHas]:checked").value === "yes";
   const body = {
     action:"save", id: editing ? editing.id : "", pin:$("fPin").value.trim(),
@@ -665,6 +676,7 @@ $("form").onsubmit = async ev => {
 };
 
 $("removeBtn").onclick = async () => {
+  if(VIDEO){ formError("Video mode is on, so nothing is removed. Use the normal link to make real changes."); return; }
   const b = $("removeBtn");
   if(!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "Tap again to remove "+editing.name; return; }
   const pin = $("fPin").value.trim();
